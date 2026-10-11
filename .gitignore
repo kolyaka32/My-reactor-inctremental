@@ -1,0 +1,60 @@
+# All untarget for git files
+
+# Compailing sytems
+.vscode/
+
+# Build folder
+build/
+
+# Adding create-archieve files in build folder
+!build/create-archieve.sh
+!build/create-archieve.bat
+
+# Old include libraries
+i686-w64-mingw32/
+x86_64-w64-mingw32/
+
+# New include libraries
+bin/
+cmake/
+lib/
+include/
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+
+# Settings and data file of program
+*.dat
+*.ini
+
+# Archives
+*.7z
+*.zip
+
+# CppCheck folders
+codeTester-cppcheck-build-dir/
+*.cppcheck

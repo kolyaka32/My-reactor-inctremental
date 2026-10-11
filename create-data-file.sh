@@ -1,0 +1,1 @@
+zip -9r build/data-ATMOS.dat ani/* img/* mus/* snd/* fnt/*
