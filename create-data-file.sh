@@ -1,1 +1,1 @@
-zip -9r build/data-ATMOS.dat ani/* img/* mus/* snd/* fnt/*
+zip -9r build/data-YARCHE.dat ani/* img/* mus/* snd/* fnt/*

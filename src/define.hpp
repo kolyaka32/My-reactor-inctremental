@@ -15,7 +15,7 @@
 #define USE_SDL_FONT         true    // Library for draw text at screen
 #define USE_NET              false   // Any of libraries for use with internet connection
 #define USE_LIBZIP           true    // Library for compress data to zip archives
-// Use setting file for store data between seccions  
+// Use setting file for store data between seccions
 #define USE_SETTING_FILE     false
 // Preloaded GFX (could be created runtime)
 #define PRELOAD_TEXTURES     true    // Preload textures
@@ -26,29 +26,28 @@
 // Use archive for store additional GFX
 #define PRELOAD_DATA PRELOAD_TEXTURES | PRELOAD_FONTS | PRELOAD_ANIMATIONS | PRELOAD_SOUNDS | PRELOAD_MUSIC
 // Additional flags
-#define CAPTURE_AUIO         false   // Flag of using audio capture device
+#define CAPTURE_AUDIO        false   // Flag of using audio capture device
 #define USE_SERIAL           false   // Flag of using serial port
 
 
 // System game name
-#define WINDOW_NAME "ATMOS"
-#define LOG_NAME "log.txt"
+#define WINDOW_NAME "YARCHE"
+#define LOG_NAME "log-%d.txt"
 
-// Base file names
 // File with all GFX
 #if (PRELOAD_DATA)
-#define DATA_FILE "data-ATMOS.dat"
+#define DATA_FILE "data-YARCHE.dat"
 #endif
 
 // File with all saved data (language, settings, volumes...)
 #if (USE_SETTING_FILE)
-#define SETTING_FILE "settings-ATMOS.ini"
+#define SETTING_FILE "settings-YARCHE.ini"
 #endif
 
 // Number of active connections in internet part
 #if (USE_NET)
 #define MAX_CONNECTIONS 1
-#define BROADCAST_APP_INDEX 2
+#define BROADCAST_APP_INDEX 9
 #define BASE_PORT 8000
 #define BROADCAST_PORT 5667
 #endif  // (USE_NET)

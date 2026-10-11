@@ -47,6 +47,7 @@ class Window {
     int getHeight() const;
     void setWidth(int width);
     void setHeight(int height);
+
     // Set current draw color
     void setDrawColor(Color color = EMPTY) const;
     // Clear all stage with setted color

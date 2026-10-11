@@ -1,1 +1,1 @@
-"C:\Program Files\7-Zip\7z.exe" a -tzip build/data-ATMOS.dat ani/* fnt/* img/* mus/* snd/* -mmt -mx9 -ssw
+"C:\Program Files\7-Zip\7z.exe" a -tzip build/data-YARCHE.dat ani/* fnt/* img/* mus/* snd/* -mmt -mx9 -ssw

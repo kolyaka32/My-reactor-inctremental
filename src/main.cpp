@@ -9,10 +9,9 @@
 // Main function
 int main(int argv, char **args) {
     // Creating main window
-    Window window{1200, 900, {"ATMOS", "АТМОС"}};
+    Window window{1200, 900, {"YARCHE", "ЯРЧЕ"}};
 
-    // Aero thermal transfer and exchange of mass project tool
-    // Аэро термо масс обмен строй
+    // Yet another reactor incremental 
 
     // Running menu
     App::run(window);
