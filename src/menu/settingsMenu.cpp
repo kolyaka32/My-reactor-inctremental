@@ -7,40 +7,51 @@
 #include "../data/cycleTemplate.hpp"
 
 
-bool SettingsMenu::active = false;
-
 SettingsMenu::SettingsMenu(const Window& _window)
-: Template(_window),
-settingButton{_window, 0.96, 0.05, 0.04, Textures::SettingsButton},
-background{_window, 0.5, 0.5, 0.4, 0.7, 20, 4},
-titleText{_window, 0.5, 0.2, {"Pause", "Пауза"}, 2, Height::Info},
+: SubWindow(_window, 0.5, 0.5, 0.42, 0.75),
+settingButton{_window, 0.97, 0.045, 0.04, Textures::SettingsButton},
+//titleText{window, 0.5, 0.13, {"Pause", "Пауза", "Pause", "Паўза"},
+//    2, GUI::Aligment::Midle, Height::Info},
+titleText{_window, {"Pause", "Пауза"}, {0.5, 0.16, .frame=2, .height=GUI::Title}},
 flags {
-    {_window, 0.4, 0.3, 0.15, Textures::FlagUSA},
-    {_window, 0.6, 0.3, 0.15, Textures::FlagRUS},
-    //{window, 0.35, 0.5, 0.25, Textures::FlagGER},
-    //{window, 0.65, 0.5, 0.25, Textures::FlagBEL},
+    {_window, 0.4, 0.3, 0.16, Textures::FlagUSA},
+    {_window, 0.6, 0.3, 0.16, Textures::FlagRUS},
+    //{_window, 0.35, 0.45, 0.25, Textures::FlagGER},
+    //{_window, 0.65, 0.45, 0.25, Textures::FlagBEL},
 },
 #if (PRELOAD_MUSIC)
-musicText{_window, 0.5, 0.58, {"Music", "Музыка"}, 1},
-musicSlider{_window, 0.5, 0.64, 0.5, audio.music.getVolume()},
+musicText{_window, {"Music", "Музыка"}, {0.5, 0.6, .frame=1}},
+//musicText{_window, {"Music", "Музыка", "Die Musik", "Музыка"}, {0.5, 0.6, .frame=1}},
+musicSlider{_window, 0.5, 0.64, 0.2, audio.music.getVolume()},
 #endif
 #if (PRELOAD_SOUNDS)
-soundText{_window, 0.5, 0.7, {"Sounds", "Звуки"}, 1},
-soundSlider{_window, 0.5, 0.76, 0.5, audio.sounds.getVolume()},
+soundText{_window, {"Sounds", "Звуки"}, {0.5, 0.68, .frame=1}},
+//soundText{_window, {"Sounds", "Звуки", "Geräusche", "Гук"}, {0.5, 0.68, .frame=1}},
+soundSlider{_window, 0.5, 0.72, 0.2, audio.sounds.getVolume()},
 #endif
-exitButton{_window, 0.5, 0.8, {"Exit", "Выход"}} {}
+exitButton{_window, {"Exit", "Выход"}, {0.5, 0.78, .frame=1}},
+closeButton{_window, {"Close", "Закрыть"}, {0.5, 0.83, .frame=1}}
+//closeButton{_window, {"Close", "Закрыть", "Ausfahrt", "Выхад"}, {0.5, 0.82, .frame=1}}
+{}
 
 bool SettingsMenu::click(const Mouse _mouse) {
     // Check, if click on setting butoon
     if (settingButton.in(_mouse)) {
-        active ^= true;  // Changing state
-        return false;
+        toggle();
+        return true;
     }
     // Clicking in menu
     if (active) {
-        // Resetting holding object
-        holdingSlider = 0;
-
+        if (exitButton.in(_mouse)) {
+            App::setNextCycle(Cycle::None);
+            CycleTemplate::stop();
+            close();
+            return true;
+        }
+        if (closeButton.in(_mouse)) {
+            close();
+            return true;
+        }
         // Check on changing language
         for (unsigned i = 0; i < (unsigned)Language::Count; ++i) {
             if (flags[i].in(_mouse)) {
@@ -53,6 +64,8 @@ bool SettingsMenu::click(const Mouse _mouse) {
                 }
             }
         }
+        // Resetting holding object
+        holdingSlider = 0;
         #if (PRELOAD_MUSIC)
         if (musicSlider.in(_mouse)) {
             holdingSlider = 1;
@@ -65,11 +78,6 @@ bool SettingsMenu::click(const Mouse _mouse) {
             return true;
         }
         #endif
-        if (exitButton.in(_mouse)) {
-            // Checking on exit
-            active = false;
-            return true;
-        }
         return true;
     }
     return false;
@@ -82,17 +90,17 @@ void SettingsMenu::unClick() {
     }
 }
 
-bool SettingsMenu::scroll(const Mouse mouse, float _wheelY) {
+bool SettingsMenu::scroll(const Mouse _mouse, float _wheelY) {
     if (active) {
         // Checking scroll on sliders
         #if (PRELOAD_MUSIC)
-        if (musicSlider.in(mouse)) {
+        if (musicSlider.in(_mouse)) {
             audio.music.setVolume(musicSlider.scroll(_wheelY));
             return true;
         }
         #endif
         #if (PRELOAD_SOUNDS)
-        if (soundSlider.in(mouse)) {
+        if (soundSlider.in(_mouse)) {
             audio.sounds.setVolume(soundSlider.scroll(_wheelY));
             return true;
         }
@@ -147,7 +155,7 @@ void SettingsMenu::blit() const {
         titleText.blit();
 
         // Blitting language buttons
-        for (unsigned i = 0; i < (unsigned)Language::Count; ++i) {
+        for (unsigned i = 0; i < unsigned(Language::Count); ++i) {
             flags[i].blit();
         }
         // Music slider
@@ -160,12 +168,8 @@ void SettingsMenu::blit() const {
         soundSlider.blit();
         soundText.blit();
         #endif
-        // Quit
+        // Buttons
+        closeButton.blit();
         exitButton.blit();
     }
-}
-
-void SettingsMenu::activate() {
-    // Changing state to opposite
-    active ^= true;
 }

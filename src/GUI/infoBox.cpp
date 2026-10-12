@@ -8,29 +8,35 @@
 #if (USE_SDL_FONT) && (PRELOAD_FONTS)
 
 
-GUI::InfoBox::InfoBox(const Window& _window, float _X, float _Y, const LanguagedText&& _texts,
-    float _size, Color _color, Aligment _aligment)
-: HighlightedStaticText(_window, _X, _Y, std::move(_texts), 2, _size, _color, _aligment) {
+GUI::InfoBox::InfoBox(const Window& _window, const LanguagedText&& _texts,
+    const TextArgument&& _arguments, unsigned _decay) noexcept
+: StaticText(_window, std::move(_texts), std::move(_arguments)),
+decayTime(_decay),
+endTime(0) {
     // Resetting transperance
-    SDL_SetTextureAlphaMod(texture, 0);
+    SDL_SetTextureAlphaMod(texture, 0.0);
 }
 
 GUI::InfoBox::InfoBox(InfoBox&& _object) noexcept
-: HighlightedStaticText(std::move(_object)),
-counter(_object.counter) {
-    SDL_SetTextureAlphaModFloat(texture, (float)counter/maxCounter);
+: StaticText(std::move(_object)),
+decayTime(_object.decayTime),
+endTime(_object.endTime) {
+    // First update to correct showing
+    update();
 }
 
 void GUI::InfoBox::update() {
-    if (counter) {
+    if (endTime >= getTime()) {
         // Setting text to be less and less visible
-        SDL_SetTextureAlphaModFloat(texture, (float)counter/maxCounter);
-        counter--;
+        SDL_SetTextureAlphaModFloat(texture, (float)(endTime - getTime()) / decayTime);
+    } else {
+        // Fully transperent
+        SDL_SetTextureAlphaModFloat(texture, 0.0);
     }
 }
 
 void GUI::InfoBox::reset() {
-    counter = maxCounter;
+    endTime = getTime() + decayTime;
 }
 
 #endif  // (USE_SDL_FONT) && (PRELOAD_FONTS)

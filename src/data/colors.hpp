@@ -19,3 +19,4 @@ typedef SDL_Color Color;
 #define BLUE {0, 0, 255, 255}
 #define GREY {175, 175, 175, 255}
 #define DARK_GREY {140, 140, 140, 255}
+#define TRANSPARENT {255, 255, 255, 0}

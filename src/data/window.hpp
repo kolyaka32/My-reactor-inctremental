@@ -6,6 +6,7 @@
 #pragma once
 
 #include <SDL3/SDL_render.h>
+#include <SDL3/SDL_dialog.h>
 #include "colors.hpp"
 #include "time.hpp"
 #include "preloaded/textures.hpp"
@@ -17,10 +18,12 @@
 // Class of window, drawn functions, work with it
 class Window {
  private:
+    SDL_DisplayID displayID;
     int width, height;
     const LanguagedText titleText;
     SDL_Window* window;
     SDL_Renderer* renderer;
+    float scale;
     #if (USE_SDL_IMAGE) && (PRELOAD_TEXTURES)
     // Preloaded textures
     const TexturesData textures;
@@ -34,6 +37,8 @@ class Window {
     const FontsData fonts;
     #endif
 
+    // Find first avaliable 
+    SDL_DisplayID getAvaliableID() const;
     // Set new title
     void updateTitle(const char* name) const;
 
@@ -45,9 +50,10 @@ class Window {
     // Operate with sizes of window
     int getWidth() const;
     int getHeight() const;
-    void setWidth(int width);
-    void setHeight(int height);
+    void setSize(int width, int height);
+    void setFullscreen();
 
+    // Drawing
     // Set current draw color
     void setDrawColor(Color color = EMPTY) const;
     // Clear all stage with setted color
@@ -110,7 +116,14 @@ class Window {
     // Work with window
     void startTextInput() const;
     void stopTextInput() const;
+    void setTitle(const LanguagedText newTitles) const;
     void updateTitle() const;
+
+    // Work with dialog
+    void showSaveFileDialog(SDL_DialogFileCallback callback, const SDL_DialogFileFilter *filters,
+        int nfilters, const char *default_location, void* argument = nullptr) const;
+    void showOpenFileDialog(SDL_DialogFileCallback callback, const SDL_DialogFileFilter *filters,
+        int nfilters, const char *default_location, bool allowMany, void* argument = nullptr) const;
 };
 
 

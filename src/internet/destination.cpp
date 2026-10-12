@@ -5,8 +5,8 @@
 
 #include "destination.hpp"
 
-#if (USE_NET)
 
+#if ((USE_WINSOCK) || (USE_SOCKET))
 
 Destination::Destination(const sockaddr_in* _address) {
     address = *_address;
@@ -49,4 +49,4 @@ Uint16 Destination::getPort() const {
     return ntohs(address.sin_port);
 }
 
-#endif  // (USE_NET)
+#endif  // ((USE_WINSOCK) || (USE_SOCKET))

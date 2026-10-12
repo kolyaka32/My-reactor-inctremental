@@ -12,18 +12,18 @@
 
 // Class with getted data from somewhere
 class GetPacket {
-    private:
+ private:
     // Address, from which
     sockaddr_in srcAddress;
     socklen_t srcAddressLength;
     // Data, contained in this array
     char buffer[100];
     int length = 0;
-    
-    public:
+
+ public:
     // Trying get new data from specified socket
     GetPacket* tryGetData(const SocketType winSocket);
-    
+
     // Working with get data
     const sockaddr_in* getSourceAddress() const;
     int getSourceAddressLength() const;
@@ -34,7 +34,8 @@ class GetPacket {
     // Functions for get data from message at specified position
     template <typename T>
     T getData(int offset) const;
-    const void* getPointer() const;
+    // Getting pointer to data in message
+    const void* getPointer(int offset) const;
 };
 
 

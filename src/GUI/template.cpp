@@ -6,9 +6,9 @@
 #include "baseGUI.hpp"
 
 
-// Tempate function for resetting texture
-GUI::Template::Template(const Window& _window)
+GUI::Template::Template(const Window& _window) noexcept
 : window(_window) {}
 
-// Template function for draw
+void GUI::Template::move(float X, float Y) {}
+
 void GUI::Template::blit() const {}

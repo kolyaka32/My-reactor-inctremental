@@ -33,11 +33,11 @@ private:
 
     // Graphical part
     GUI::RectBackplate panelBackplate;
-    GUI::HighlightedStaticText modeText;
+    GUI::StaticText modeText;
     GUI::SwitchBox modeSwitchBox;
     GUI::DynamicText pickedPressure;
     GUI::DynamicText pickedTemperature;
-    GUI::HighlightedStaticText buildText;
+    GUI::StaticText buildText;
     GUI::SwitchBox buildSwitchBox;
     GUI::TextButton resetButton;
 
@@ -47,11 +47,11 @@ public:
     void reset();
 
     // Interacting with scale and position
-    void click(const Mouse mouse);
-    void update(const Mouse mouse);
+    bool click(const Mouse mouse);
     void unclick(const Mouse mouse);
-    void scroll(const Mouse mouse, float wheelY);
+    bool scroll(const Mouse mouse, float wheelY);
     bool press(SDL_Keycode key);
+    void update(const Mouse mouse);
 
     void blit() const;
 };

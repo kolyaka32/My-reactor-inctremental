@@ -6,13 +6,15 @@
 #include "baseGUI.hpp"
 
 
-GUI::RectBackplate::RectBackplate(const Window& _window, float _centerX, float _centerY, float _width, float _height,
-    float _border, Color _frontColor, Color _backColor)
-: RectBackplate(_window, {_window.getWidth() * (_centerX - _width/2), _window.getHeight() * (_centerY - _height/2),
-    _window.getWidth() * _width, _window.getHeight() * _height}, _border, _frontColor, _backColor) {}
+GUI::RectBackplate::RectBackplate(const Window& _window, float _X, float _Y,
+    float _width, float _height, float _border, Color _frontColor, Color _backColor) noexcept
+: RectBackplate(_window, {_window.getWidth() * (_X - _width/2),
+    _window.getHeight() * (_Y - _height/2),
+    _window.getWidth() * _width,
+    _window.getHeight() * _height}, _border, _frontColor, _backColor) {}
 
 GUI::RectBackplate::RectBackplate(const Window& _window, const SDL_FRect& _rect, float _border,
-    Color _frontColor, Color _backColor)
+    Color _frontColor, Color _backColor) noexcept
 : TextureTemplate(_window, _rect, _window.createTexture(_rect.w, _rect.h)) {
     // Rendering backplate
     window.setRenderTarget(texture);

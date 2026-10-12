@@ -16,16 +16,18 @@ cellRect{_boardX*_window.getWidth(), _boardY*_window.getHeight(), 40.0f, 40.0f},
 holdingCell{},
 holdingCellRect{0.0f, 0.0f, cellRect.w, cellRect.h},
 panelBackplate(_window, _panelW/2, 0.5, _panelW, 1.0, 2.0, GREY, BLACK),
-modeText(_window, _panelW/2, 0.15, {"Show mode:", "Режим отображения:"}, 1),
-modeSwitchBox(_window, _panelW/2, 0.185, 0.2, {{"Elements", "Элементы"},
-    {"Thermal", "Температурный"}, {"Pressure", "Давление"}}),
-pickedPressure(_window, _panelW/4, 0.3, {"Pressure:%6.1f", "Давление:%6.1f"}, Height::Main, BLACK, GUI::Aligment::Left),
-pickedTemperature(_window, _panelW/4, 0.33, {"Temperature:%4.1f", "Температура:%4.1f"}, Height::Main, BLACK, GUI::Aligment::Left),
-buildText(_window, _panelW/2, 0.5, {"Build object:", "Объект постройки:"}, 1),
-buildSwitchBox(_window, _panelW/2, 0.535, 0.2, {{"Not selected", "Не выбран"},
-    {"Demplish", "Снести"}, {"Wall", "Стена"}, {"Vent", "Вентилятор"}, {"Heater", "Нагреватель"},
-    {"Check valve", "Обратный клапан"}, {"Cooler", "Холодильник"}}),
-resetButton(_window, _panelW/2, 0.8, {"Reset", "Сброс"}) {}
+modeText(_window, {"Show mode:", "Режим отображения:"}, {_panelW/2, 0.15, .frame=1}),
+modeSwitchBox(_window, {_panelW/2, 0.185}, 0.2, {{"Elements", "Элементы"}, {"Thermal", "Температурный"},
+    {"Pressure", "Давление"}}),
+pickedPressure(_window, {"Pressure:%6.1f", "Давление:%6.1f"},
+    {_panelW/4, 0.3, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
+pickedTemperature(_window, {"Temperature:%4.1f", "Температура:%4.1f"},
+    {_panelW/4, 0.33, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
+buildText(_window, {"Build object:", "Объект постройки:"}, {_panelW/2, 0.5, .frame=1}),
+buildSwitchBox(_window, {_panelW/2, 0.535}, 0.2,
+    {{"Not selected", "Не выбран"}, {"Demplish", "Снести"}, {"Wall", "Стена"}, {"Vent", "Вентилятор"},
+    {"Heater", "Нагреватель"}, {"Check valve", "Обратный клапан"}, {"Cooler", "Холодильник"}}),
+resetButton(_window, {"Reset", "Сброс"}, {_panelW/2, 0.8, .frame=1}) {}
 
 void BoardInteracter::reset() {
     board.reset();
@@ -34,12 +36,13 @@ void BoardInteracter::reset() {
     pickedTemperature.setValues(0.0f);
 }
 
-void BoardInteracter::click(const Mouse _mouse) {
+bool BoardInteracter::click(const Mouse _mouse) {
     // Check, if in interface part
     if (panelBackplate.in(_mouse)) {
         // Check, if changing show mode
-        if (modeSwitchBox.click(_mouse)) {
+        if (GUI::Code code = modeSwitchBox.click(_mouse)) {
             showState = ShowState(modeSwitchBox.getValue());
+            return true;
         }
         // Update building menu
         if (buildSwitchBox.click(_mouse)) {
@@ -76,9 +79,9 @@ void BoardInteracter::click(const Mouse _mouse) {
         // Check, if reset
         if (resetButton.in(_mouse)) {
             board.reset();
-            return;
+            return true;
         }
-        return;
+        return true;
     }
     // Check, if start interaction
     mousePress = _mouse.getState();
@@ -86,7 +89,9 @@ void BoardInteracter::click(const Mouse _mouse) {
     // Start camera movement
     if (mousePress == SDL_BUTTON_MMASK) {
         grid.click(_mouse.getX(), _mouse.getY());
+        return true;
     }
+    return false;
 }
 
 void BoardInteracter::unclick(const Mouse _mouse) {
@@ -94,8 +99,9 @@ void BoardInteracter::unclick(const Mouse _mouse) {
     mousePress = 0;
 }
 
-void BoardInteracter::scroll(const Mouse _mouse, float _wheelY) {
+bool BoardInteracter::scroll(const Mouse _mouse, float _wheelY) {
     grid.zoom(_wheelY, _mouse);
+    return true;
 }
 
 bool BoardInteracter::press(SDL_Keycode _key) {

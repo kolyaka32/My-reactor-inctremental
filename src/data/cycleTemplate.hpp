@@ -24,15 +24,17 @@ class CycleTemplate {
 
     // Cycle functions for cycle (should be overriden)
     void getInput();            // Getting all user input
+    virtual void preUpdate();   // Function before inputting
     virtual void update();      // Getting special objects update
     virtual void draw() const;  // Draw all need objects
+    virtual void postUpdate();  // Function after draw
 
     // Subprograms for get need input
     virtual bool inputMouseDown();                // Actioning for mouse button pressing
     virtual void inputMouseUp();                  // Actioning for mouse button unpressing
-    virtual void inputKeys(SDL_Keycode key);      // Actioning for any keys pressing
-    virtual void inputMouseWheel(float _wheelY);  // Actioning for scrolling wheel
-    virtual void inputText(const char* text);     // Actioning for typing text
+    virtual bool inputKeys(SDL_Keycode key);      // Actioning for any keys pressing
+    virtual bool inputMouseWheel(float _wheelY);  // Actioning for scrolling wheel
+    virtual bool inputText(const char* text);     // Actioning for typing text
 
  public:
     CycleTemplate(Window& window);

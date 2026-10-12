@@ -54,6 +54,12 @@ float GUI::Slider::scroll(float _wheelY) {
     return 0;
 }
 
+void GUI::Slider::move(float _X, float _Y) {
+    TextureTemplate::move(_X, _Y);
+    buttonRect.x += _X*window.getWidth();
+    buttonRect.y += _Y*window.getHeight();
+}
+
 void GUI::Slider::blit() const {
     window.blit(texture, rect);
     window.blit(buttonTexture, buttonRect);

@@ -28,11 +28,6 @@ void GUI::TextureTemplate::move(float _X, float _Y) {
     rect.y += _Y*window.getHeight();
 }
 
-void GUI::TextureTemplate::moveAbsolute(float _X, float _Y) {
-    rect.x += _X;
-    rect.y += _Y;
-}
-
 // Template function for draw
 void GUI::TextureTemplate::blit() const {
     window.blit(texture, rect);

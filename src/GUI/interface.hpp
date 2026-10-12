@@ -7,6 +7,4 @@
 
 // File for correct including
 #include "baseGUI.hpp"
-#include "typeField.cpp"
-#include "typeBox.cpp"
 #include "scrollBox.cpp"

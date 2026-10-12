@@ -8,7 +8,8 @@
 #if (USE_SDL_IMAGE) && (PRELOAD_TEXTURES)
 
 
-GUI::ImageButton::ImageButton(const Window& _window, float _X, float _Y, float _width, Textures _index)
+GUI::ImageButton::ImageButton(const Window& _window, float _X, float _Y,
+    float _width, Textures _index) noexcept
 : TextureTemplate(_window) {
     // Setting base texture
     texture = window.getTexture(_index);

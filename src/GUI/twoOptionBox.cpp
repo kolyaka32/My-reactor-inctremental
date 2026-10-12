@@ -8,54 +8,47 @@
 #if (USE_SDL_FONT) && (PRELOAD_FONTS)
 
 
-GUI::TwoOptionBox::TwoOptionBox(const Window& _window, const LanguagedText&& _title,
-    const LanguagedText&& _button1Text, const LanguagedText&& _button2Text)
-: Template(_window),
-button1(_window, 0.5, 0.48, std::move(_button1Text)),
-button2(_window, 0.5, 0.6, std::move(_button2Text)),
-mainText(_window, 0.5, 0.35, std::move(_title), 1, Height::SubTitle),
-background(_window, 0.5, 0.5, 0.9, 0.4, 5.0, 1.0) {}
+GUI::TwoOptionBox::TwoOptionBox(const Window& _window, float _X, float _Y, float _W, float _H,
+    const LanguagedText&& _title, const LanguagedText&& _button1,
+    const LanguagedText&& _button2) noexcept
+: SubWindow(_window, _X, _Y, _W, _H),
+title(_window, std::move(_title), {_X, _Y-_H*0.3f, .frame=1, .height=GUI::SubTitle}),
+button1(_window, std::move(_button1), {_X, _Y+_H*0.08f, .frame=1}),
+button2(_window, std::move(_button2), {_X, _Y+_H*0.32f, .frame=1}) {}
 
 GUI::TwoOptionBox::TwoOptionBox(TwoOptionBox&& _object) noexcept
-: Template(_object.window),
-active(_object.active),
+: SubWindow(std::move(_object)),
+title(std::move(_object.title)),
 button1(std::move(_object.button1)),
-button2(std::move(_object.button2)),
-mainText(std::move(_object.mainText)),
-background(std::move(_object.background)) {}
+button2(std::move(_object.button2)) {}
 
-int GUI::TwoOptionBox::click(const Mouse _mouse) {
+GUI::Code GUI::TwoOptionBox::click(const Mouse _mouse) {
     if (active) {
         // Returning to menu
         if (button1.in(_mouse)) {
-            return 2;
+            return Button1;
         }
         if (button2.in(_mouse)) {
-            return 3;
+            return Button2;
         }
-        return 1;
+        return Some;
     }
-    return 0;
+    return None;
 }
 
-void GUI::TwoOptionBox::activate() {
-    active = true;
-}
-
-void GUI::TwoOptionBox::reset() {
-    active = false;
-}
-
-bool GUI::TwoOptionBox::isActive() const {
-    return active;
+void GUI::TwoOptionBox::move(float _X, float _Y) {
+    SubWindow::move(_X, _Y);
+    title.move(_X, _Y);
+    button1.move(_X, _Y);
+    button2.move(_X, _Y);
 }
 
 void GUI::TwoOptionBox::blit() const {
     if (active) {
         background.blit();
+        title.blit();
         button1.blit();
         button2.blit();
-        mainText.blit();
     }
 }
 

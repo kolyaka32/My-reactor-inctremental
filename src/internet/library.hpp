@@ -5,15 +5,12 @@
 
 #pragma once
 
+#include <SDL3/SDL_platform_defines.h>
 #include "../internetCodes.hpp"
+#include "../data/logger.hpp"
 
 // Check, if use net
 #if (USE_NET)
-
-#include <SDL3/SDL_platform_defines.h>
-#include "../data/logger.hpp"
-#include "../data/array.hpp"
-
 
 // Select library depend on platform
 // Windows

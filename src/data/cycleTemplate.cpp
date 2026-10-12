@@ -78,7 +78,11 @@ void CycleTemplate::getInput() {
 // Empty template for draw
 void CycleTemplate::draw() const {}
 
+void CycleTemplate::preUpdate() {}
+
 void CycleTemplate::update() {}
+
+void CycleTemplate::postUpdate() {}
 
 bool CycleTemplate::inputMouseDown() {
     return false;
@@ -87,24 +91,24 @@ bool CycleTemplate::inputMouseDown() {
 void CycleTemplate::inputMouseUp() {}
 
 // Example for getting keys input
-void CycleTemplate::inputKeys(SDL_Keycode _key) {
-    /*switch (_key) {
-    case SDLK_ESCAPE:
-        // Stopping ruuning by escape
-        running = false;
-        return;
+bool CycleTemplate::inputKeys(SDL_Keycode _key) {
+    /*if (_key == SDLK_ESCAPE) {
+        return true;
     }*/
+    return false;
 }
 
 // Example for getting mouse wheel input
-void CycleTemplate::inputMouseWheel(float _wheelY) {
-    // if (MusicSlider.scroll(event.wheel.y, mouse));
-    // else if (SoundSlider.scroll(event.wheel.y, mouse));
+bool CycleTemplate::inputMouseWheel(float _wheelY) {
+    // if (MusicSlider.scroll(mouse, _wheelY));
+    // else if (SoundSlider.scroll(mouse, _wheelY));
+    return false;
 }
 
 // Example for getting text input
-void CycleTemplate::inputText(const char* text) {
-    // typeBox.writeString(event.text.text);
+bool CycleTemplate::inputText(const char* _text) {
+    // typeBox.writeString(_text);
+    return false;
 }
 
 // Function for start need cycle
@@ -114,6 +118,9 @@ void CycleTemplate::run() {
 
     // Starting main cycle
     while (running) {
+        // Pre-update
+        preUpdate();
+
         // Getting user input
         getInput();
 
@@ -122,6 +129,9 @@ void CycleTemplate::run() {
 
         // Drawing interface
         draw();
+
+        // Post-update
+        postUpdate();
 
         // Standing in idle state
         idleTimer.sleep();

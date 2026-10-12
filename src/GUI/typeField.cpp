@@ -7,51 +7,29 @@
 
 #if (USE_SDL_FONT) && (PRELOAD_FONTS)
 
-#include <cstdlib>
-#include <algorithm>
 
-
-// Type field class
-template <unsigned bufferSize>
-GUI::TypeField<bufferSize>::TypeField(const Window& _window, float _X, float _Y, const char* _startText,
-    float _height, Aligment _aligment, Color _textColor, Color _backColor)
+GUI::TypeField::TypeField(const Window& _window, const TextArgument&& _arg,
+    size_t _maxLength, const char* _startText) noexcept
 : TextureTemplate(_window),
-posX(window.getWidth()*_X),
-aligment(_aligment),
-textColor(_textColor),
-backColor(_backColor),
-font(window.createFontCopy(Fonts::Main, _height)) {
-    // Setting rects
-    rect = {0, window.getHeight()*_Y-_height/2, 0, 0};
-    caretRect = {0, window.getHeight()*_Y-_height/2, 2, 0};
-    inversedRectDest.y = window.getHeight()*_Y-_height/2;
-    inversedRectSrc.y = 0;
+argument(std::move(_arg)),
+font(window.createFontCopy(_arg.font, _arg.height)),
+maxLength(_maxLength),
+inverseTexture(nullptr) {
+    // Setting position of text rects
+    rect.h = TTF_GetFontHeight(font);
+    rect.y = window.getHeight()*argument.Y - rect.h*argument.verAli/2;
+    inversedRectDest = {0.0, rect.y, 0.0, rect.h};
+    caretRect = {0.0, rect.y, 2.0, rect.h};
+    inversedRectSrc = {0.0, 0.0, 0.0, rect.h};
 
-    // Copying text to caret
-    length = strlen(_startText);
-    setMax(length, (size_t)bufferSize);
-    memcpy(buffer, _startText, length);
-
-    // Creating first texture, if there was any text
-    if (length) {
-        updateTexture();
-    } else {
-        // Create empty texture
-        texture = window.createTexture(font, "1", textColor);
-        inverseTexture = window.createTexture(font, "1", textColor);
-    }
-    // Setting height of text
-    inversedRectDest.h = inversedRectSrc.h = caretRect.h = rect.h = texture->h;
+    setString(_startText);
 }
 
-template <unsigned bufferSize>
-GUI::TypeField<bufferSize>::TypeField(TypeField&& _object) noexcept
+GUI::TypeField::TypeField(TypeField&& _object) noexcept
 : TextureTemplate(std::move(_object)),
-posX(_object.posX),
-aligment(_object.aligment),
-textColor(_object.textColor),
-backColor(_object.backColor),
+argument(std::move(_object.argument)),
 font(_object.font),
+maxLength(_object.length),
 length(_object.length),
 caret(_object.caret),
 needSwapCaret(_object.needSwapCaret),
@@ -64,42 +42,23 @@ inverseTexture(_object.inverseTexture),
 pressed(_object.pressed),
 selected(_object.selected) {
     // Copying previous text
-    memcpy(buffer, _object.buffer, bufferSize+1);
+    memcpy(buffer, _object.buffer, maxLength);
 }
 
-template <unsigned bufferSize>
-GUI::TypeField<bufferSize>::~TypeField() noexcept {
+GUI::TypeField::~TypeField() noexcept {
     // Check, if not moved
     if (texture) {
         // Clearing rest texture
         SDL_DestroyTexture(texture);
         SDL_DestroyTexture(inverseTexture);
-        
+    }
+    if (font) {
         // Clearing font
         TTF_CloseFont(font);
     }
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::reset() {
-    if (selected) {
-        // Stoping entering any letters
-        window.stopTextInput();
-
-        // Resetting selection
-        selected = false;
-        pressed = false;
-        
-        // Clearing caret
-        showCaret = false;
-        selectLength = 0;
-        
-        //updateSelected();
-    }
-}
-
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::updateTexture() {
+void GUI::TypeField::updateTexture() {
     // Checking, if string exsist
     if (length) {
         // Clearing previous
@@ -109,99 +68,110 @@ void GUI::TypeField<bufferSize>::updateTexture() {
         }
 
         // Creating main text texture
-        SDL_Surface* mainSurface = TTF_RenderText_Shaded(font, buffer, length, textColor, backColor);
+        SDL_Surface* mainSurface = TTF_RenderText_Shaded(font, buffer, length,
+            argument.textColor, argument.backColor);
         texture = window.createTextureAndFree(mainSurface);
 
         // Create inversed text texture
-        SDL_Surface* inversedSurface = TTF_RenderText_Shaded(font, buffer, length, backColor, textColor);
+        SDL_Surface* inversedSurface = TTF_RenderText_Shaded(font, buffer, length,
+            argument.backColor, argument.textColor);
         inverseTexture = window.createTextureAndFree(inversedSurface);
 
         // Resetting place of text with saving aligment
-        rect.w = texture->w;
-        rect.x = SDL_floorf(posX - rect.w * (unsigned)aligment / 2);
-        updateSelected();
-    } else {
-        caretRect.x = posX - 1;
+        rect = argument.getRect(window, texture);
     }
+    updateSelected();
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::updateSelected() {
-    // Update caret place
-    if (caret) {
-        int caretX = 0;
-        TTF_GetStringSize(font, buffer, caret, &caretX, nullptr);
-        caretRect.x = rect.x + caretX - 1;
-    } else {
-        caretRect.x = rect.x - 1;
-    }
-
-    // Inversing selected part of text, if need
-    if (selectLength) {
-        // Getting start position and length of selected part
-        int startPosition, length;
-        if (selectLength > 0) {
-            if (caret == 0) {
-                startPosition = 0;
-            } else {
-                TTF_GetStringSize(font, buffer, caret, &startPosition, nullptr);
-            }
-            TTF_GetStringSize(font, buffer+caret, selectLength, &length, nullptr);
+void GUI::TypeField::updateSelected() {
+    if (length) {
+        // Update caret place
+        if (caret) {
+            int caretX = 0;
+            TTF_GetStringSize(font, buffer, caret, &caretX, nullptr);
+            caretRect.x = rect.x + caretX - 1;
         } else {
-            if (-selectLength == caret) {
-                startPosition = 0;
+            caretRect.x = rect.x - 1;
+        }
+
+        // Inversing selected part of text, if need
+        if (selectLength) {
+            // Getting start position and length of selected part
+            int startPosition, length;
+            if (selectLength > 0) {
+                if (caret == 0) {
+                    startPosition = 0;
+                } else {
+                    TTF_GetStringSize(font, buffer, caret, &startPosition, nullptr);
+                }
+                TTF_GetStringSize(font, buffer+caret, selectLength, &length, nullptr);
             } else {
-                TTF_GetStringSize(font, buffer, caret + selectLength, &startPosition, nullptr);
+                if (-selectLength == caret) {
+                    startPosition = 0;
+                } else {
+                    TTF_GetStringSize(font, buffer, caret + selectLength, &startPosition, nullptr);
+                }
+                TTF_GetStringSize(font, buffer+caret+selectLength, -selectLength, &length, nullptr);
             }
-            TTF_GetStringSize(font, buffer+caret+selectLength, -selectLength, &length, nullptr);
+            inversedRectSrc.x = startPosition;
+            inversedRectDest.x = inversedRectSrc.x + rect.x;
+            inversedRectDest.w = inversedRectSrc.w = length;
         }
-        inversedRectSrc.x = startPosition;
-        inversedRectDest.x = inversedRectSrc.x + rect.x;
-        inversedRectDest.w = inversedRectSrc.w = length;
+    } else {
+        caretRect.x = argument.X*window.getWidth() - 1;
     }
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::writeString(const char* _str) {
-    if (selected) {
-        // Resetting
-        pressed = false;
-        deleteSelected();
-
-        // Inserting text from clipboard
-        size_t clipboardSize = strlen(_str);
-
-        // Checking, if all clipboard can be placed in buffer
-        if (clipboardSize > bufferSize - length) {
-            clipboardSize = bufferSize - length;
-        }
-
-        // Moving part after caret at end
-        for (size_t i = length; i > caret; --i) {
-            buffer[i + clipboardSize - 1] = buffer[i-1];
-        }
-
-        // Coping main clipboard text
-        for (size_t i=0; i < clipboardSize; ++i) {
-            buffer[caret + i] = _str[i];
-        }
-
-        length += clipboardSize;
-        caret += clipboardSize;
-        updateTexture();
+bool GUI::TypeField::writeString(const char* _str) {
+    if (!selected) {
+        return false;
     }
+    // Resetting
+    pressed = false;
+    deleteSelected();
+
+    // Counting codepoints
+    int codelen = 0;
+    for (int i=0; i < length;) {
+        if (int len = getNextChar(buffer+i)) {
+            codelen++;
+            i += len;
+        } else {
+            i++;
+        }
+    }
+    // Parsing recieved text
+    for (const char* c = _str; *c && (*c != '\n');) {
+        // Check codepoint length
+        if (int len = getNextChar(c)) {
+            // Moving all after codepoint
+            for (int i = length; i > caret; --i) {
+                buffer[i + len - 1] = buffer[i-1];
+            }
+            memcpy(buffer+caret, c, len);
+            length += len;
+            caret += len;
+            c += len;
+            codelen++;
+            if (codelen == maxLength) {
+                break;
+            }
+        } else {
+            c++;
+        }
+    }
+    updateTexture();
+    return true;
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::writeClipboard() {
+void GUI::TypeField::writeClipboard() {
     // Getting and writing clipboard to caret
     char* clippboard = SDL_GetClipboardText();
     writeString(clippboard);
     SDL_free(clippboard);
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::copyToClipboard() {
+void GUI::TypeField::copyToClipboard() {
     if (selectLength) {
         // Static memory for write clipbpard
         static char clipboardText[100];
@@ -215,8 +185,7 @@ void GUI::TypeField<bufferSize>::copyToClipboard() {
     }
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::deleteSelected() {
+void GUI::TypeField::deleteSelected() {
     if (selectLength) {
         if (selectLength < 0) {
             for (size_t i=caret; i < length; ++i) {
@@ -234,84 +203,167 @@ void GUI::TypeField<bufferSize>::deleteSelected() {
     }
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::type(SDL_Keycode _code) {
+GUI::Code GUI::TypeField::type(SDL_Keycode _code) {
     // Checking, if box selected
     if (!selected) {
-        return;
+        return None;
     }
-
-    // Resetting flag of pressing
-    pressed = false;
-
     // Getting current shft and control state
     SDL_Keymod keyMods = SDL_GetModState();
 
-    // Switching between extra input options
+    // Additional actions for control commands
+    if (keyMods & SDL_KMOD_CTRL) {
+        switch (_code) {
+        case SDLK_BACKSPACE:
+            // Coping after caret
+            if (selectLength == 0) {
+                if (caret == 0) {
+                    return Some;
+                }
+                selectLength = getPrevBlock(buffer+caret, -caret);
+            }
+            deleteSelected();
+            break;
+
+        case SDLK_DELETE:
+            // Coping after caret
+            if (selectLength == 0) {
+                if (caret == length) {
+                    return Some;
+                }
+                selectLength = getNextBlock(buffer+caret, length-caret);
+            }
+            deleteSelected();
+            break;
+
+        case SDLK_LEFT:
+            if (keyMods & SDL_KMOD_SHIFT) {
+                if (caret > 0) {
+                    int offset = getPrevBlock(buffer+caret, -caret);
+                    caret += offset;
+                    selectLength -= offset;
+                }
+            } else {
+                if (selectLength) {
+                    if (selectLength < 0) {
+                        caret += selectLength;
+                    }
+                    selectLength = 0;
+                } else if (caret > 0) {
+                    caret += getPrevBlock(buffer+caret, -caret);
+                }
+            }
+            updateSelected();
+            return Some;
+
+        case SDLK_RIGHT:
+            if (keyMods & SDL_KMOD_SHIFT) {
+                if (caret < length) {
+                    int offset = getNextBlock(buffer+caret, length-caret);
+                    caret += offset;
+                    selectLength -= offset;
+                }
+            } else {
+                if (selectLength) {
+                    if (selectLength > 0) {
+                        caret += selectLength;
+                    }
+                    selectLength = 0;
+                } else if (caret < length) {
+                    caret += getNextBlock(buffer+caret, length-caret);
+                }
+            }
+            updateSelected();
+            return Some;
+
+        case SDLK_V:
+            writeClipboard();
+            break;
+
+        case SDLK_C:
+            copyToClipboard();
+            break;
+
+        case SDLK_X:
+            copyToClipboard();
+            deleteSelected();
+            break;
+
+        case SDLK_A:
+            // Selecing all text
+            caret = length;
+            selectLength = -length;
+            break;
+
+        default:
+            return None;
+        }
+        // Updating texture after modifiying text
+        updateTexture();
+        return Some;
+    }
+    // Normal switching for extra inputs
     switch (_code) {
-    // Functions for deleting text
     case SDLK_BACKSPACE:
-        // Coping after caret
         if (selectLength == 0) {
             if (caret == 0) {
-                return;
+                return Some;
             }
-            selectLength = -1;
+            selectLength = getPrevChar(buffer+caret);
         }
         deleteSelected();
         break;
 
     case SDLK_DELETE:
-        // Coping after caret
         if (selectLength == 0) {
             if (caret == length) {
-                return;
+                return Some;
             }
-            selectLength = 1;
+            selectLength = getNextChar(buffer+caret);
         }
         deleteSelected();
         break;
 
-    // Moving caret
     case SDLK_LEFT:
         if (keyMods & SDL_KMOD_SHIFT) {
             if (caret > 0) {
-                caret--;
-                selectLength++;
+                int offset = getPrevChar(buffer+caret);
+                caret += offset;
+                selectLength -= offset;
             }
         } else {
-            if (caret > 0) {
+            if (selectLength) {
                 if (selectLength < 0) {
                     caret += selectLength;
-                } else {
-                    caret--;
                 }
+                selectLength = 0;
+            } else if (caret > 0) {
+                caret += getPrevChar(buffer+caret);
             }
-            selectLength = 0;
         }
         updateSelected();
-        return;
+        return Some;
 
     case SDLK_RIGHT:
         if (keyMods & SDL_KMOD_SHIFT) {
             if (caret < length) {
-                caret++;
-                selectLength--;
+                int offset = getNextChar(buffer+caret);
+                caret += offset;
+                selectLength -= offset;
             }
         } else {
-            if (caret < length) {
+            if (selectLength) {
                 if (selectLength > 0) {
                     caret += selectLength;
-                } else {
-                    caret++;
                 }
+                selectLength = 0;
+            } else if (caret < length) {
+                caret += getNextChar(buffer+caret);
             }
-            selectLength = 0;
         }
         updateSelected();
-        return;
+        return Some;
 
-    // Special keys for faster caret move
     case SDLK_END:
     case SDLK_PAGEDOWN:
         if (keyMods & SDL_KMOD_SHIFT) {
@@ -321,7 +373,7 @@ void GUI::TypeField<bufferSize>::type(SDL_Keycode _code) {
         }
         caret = length;
         updateSelected();
-        return;
+        return Some;
 
     case SDLK_HOME:
     case SDLK_PAGEUP:
@@ -332,9 +384,8 @@ void GUI::TypeField<bufferSize>::type(SDL_Keycode _code) {
         }
         caret = 0;
         updateSelected();
-        return;
+        return Some;
 
-    // Clipboard
     case SDLK_PASTE:
         writeClipboard();
         break;
@@ -348,48 +399,66 @@ void GUI::TypeField<bufferSize>::type(SDL_Keycode _code) {
         deleteSelected();
         break;
 
-    case SDLK_V:
-        if (keyMods & SDL_KMOD_CTRL) {
-            writeClipboard();
+    case SDLK_ESCAPE:
+        if (selectLength) {
+            selectLength = 0;
+            updateSelected();
         } else {
-            return;
+            // Stop entering
+            // Resetting selection
+            selected = false;
+            pressed = false;
+            showCaret = false;
+            // Stoping entering any letters
+            window.stopTextInput();
+            return Finished;
         }
         break;
 
-    case SDLK_C:
-        if (keyMods & SDL_KMOD_CTRL) {
-            copyToClipboard();
-        } else {
-            return;
-        }
-        break;
-
-    case SDLK_X:
-        if (keyMods & SDL_KMOD_CTRL) {
-            copyToClipboard();
-            deleteSelected();
-        } else {
-            return;
-        }
-        break;
-
-    case SDLK_A:
-        if (keyMods & SDL_KMOD_CTRL) {
-            // Selecing all text
-            caret = length;
-            selectLength = -length;
-        }
-        break;
+    case SDLK_RETURN:
+    case SDLK_RETURN2:
+        // Stop entering
+        updateSelected();
+        // Resetting selection
+        selected = false;
+        pressed = false;
+        selectLength = 0;
+        showCaret = false;
+        // Stoping entering any letters
+        window.stopTextInput();
+        // Return action
+        return Activate;
 
     default:
-        return;
+        return None;
     }
     // Updating texture after modifiying text
     updateTexture();
+    return Some;
 }
 
-template <unsigned bufferSize>
-bool GUI::TypeField<bufferSize>::click(const Mouse _mouse) {
+bool GUI::TypeField::checkOff(const Mouse _mouse) {
+    if (selected && !in(_mouse)) {
+        // Resetting selection
+        selected = false;
+        pressed = false;
+
+        // Stoping entering any letters
+        window.stopTextInput();
+
+        // Clearing caret
+        showCaret = false;
+        selectLength = 0;
+
+        updateSelected();
+
+        // Return, that finish text input
+        return true;
+    }
+    return false;
+}
+
+GUI::Code GUI::TypeField::click(const Mouse _mouse) {
     if (in(_mouse)) {
         // Resetting values
         pressed = true;
@@ -409,23 +478,26 @@ bool GUI::TypeField<bufferSize>::click(const Mouse _mouse) {
         }
         // Showing caret
         updateSelected();
-        return false;
-    } else if (selected) {
-        reset();
-
-        // Return, that finish text input
-        return true;
+        return Some;
     }
-    return false;
+    return None;
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::unclick() {
+void GUI::TypeField::unclick() {
     pressed = false;
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::update(float _mouseX) {
+void GUI::TypeField::move(float _X, float _Y) {
+    TextureTemplate::move(_X, _Y);
+    argument.X += _X;
+    argument.Y += _Y;
+    caretRect.x += _X*window.getWidth();
+    caretRect.y += _Y*window.getHeight();
+    inversedRectDest.x += _X*window.getWidth();
+    inversedRectDest.y += _Y*window.getHeight();
+}
+
+void GUI::TypeField::update(float _mouseX) {
     if (pressed) {
         size_t measure;
         if (length) {
@@ -446,8 +518,7 @@ void GUI::TypeField<bufferSize>::update(float _mouseX) {
     }
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::blit() const {
+void GUI::TypeField::blit() const {
     // Rendering main text
     if (length) {
         window.blit(texture, rect);
@@ -465,20 +536,133 @@ void GUI::TypeField<bufferSize>::blit() const {
     }
 }
 
-template <unsigned bufferSize>
-const char* GUI::TypeField<bufferSize>::getString() {
+const char* GUI::TypeField::getString() {
     buffer[length] = '\0';
     return buffer;
 }
 
-template <unsigned bufferSize>
-void GUI::TypeField<bufferSize>::setString(const char* _newString) {
-    length = min(strlen(_newString), (size_t)bufferSize);
-    memcpy(buffer, _newString, length);
+void GUI::TypeField::setString(const char* _newString) {
+    // resetting flags
+    selected = false;
+    pressed = false;
+    showCaret = false;
+    length = 0;
+    selectLength = 0;
 
-    reset();
+    window.stopTextInput();
 
+    if (_newString == nullptr) {
+        return;
+    }
+
+    // Counting actual codepoints
+    int codeCount = 0;
+    // Parsing new text
+    for (const char* c = _newString; *c && (*c != '\n');) {
+        // Check codepoint length
+        if (int len = getNextChar(c)) {
+            // Copying codepoint
+            memcpy(buffer + length, c, len);
+            length += len;
+            c += len;
+            // Check on max length
+            codeCount++;
+            if (codeCount == maxLength) {
+                break;
+            }
+        } else {
+            c++;
+        }
+    }
     updateTexture();
+}
+
+int GUI::TypeField::getNextChar(const char* _str) const {
+    // Mask: 0yyyyyyy
+    if ((_str[0] & 0b10000000) == 0b0) {
+        return 1;
+    }
+    // Mask: 110yyyyy 10yyyyyyyy
+    if ((_str[1] & 0b11000000) != 0b10000000) {
+        return 0;
+    }
+    if ((_str[0] & 0b11100000) == 0b11000000) {
+        return 2;
+    }
+    // Mask: 1110yyyy 10yyyyyyyy 10yyyyyyyy
+    if ((_str[2] & 0b11000000) != 0b10000000) {
+        return 0;
+    }
+    if ((_str[0] & 0b11110000) == 0b11100000) {
+        return 3;
+    }
+    // Mask: 11110yyy 10yyyyyyyy 10yyyyyyyy 10yyyyyyyy
+    if ((_str[3] & 0b11000000) != 0b10000000) {
+        return 0;
+    }
+    if ((_str[0] & 0b11111000) == 0b11110000) {
+        return 4;
+    }
+    // In other - error
+    return 0;
+}
+
+int GUI::TypeField::getPrevChar(const char* _str) const {
+    // Mask: 0yyyyyyy
+    if ((_str[-1] & 0b10000000) == 0b0) {
+        return -1;
+    }
+    // Mask: 110yyyyy 10yyyyyyyy
+    if ((_str[-1] & 0b11000000) != 0b10000000) {
+        return 0;
+    }
+    if ((_str[-2] & 0b11100000) == 0b11000000) {
+        return -2;
+    }
+    // Mask: 1110yyyy 10yyyyyyyy 10yyyyyyyy
+    if ((_str[-2] & 0b11000000) != 0b10000000) {
+        return 0;
+    }
+    if ((_str[-3] & 0b11110000) == 0b11100000) {
+        return -3;
+    }
+    // Mask: 11110yyy 10yyyyyyyy 10yyyyyyyy 10yyyyyyyy
+    if ((_str[-3] & 0b11000000) != 0b10000000) {
+        return 0;
+    }
+    if ((_str[-4] & 0b11111000) == 0b11110000) {
+        return -4;
+    }
+    // In other - error
+    return 0;
+}
+
+bool GUI::TypeField::isSpec(char _c) const {
+    return (_c==' ') || (_c==',') || (_c=='.') || (_c=='/') || (_c=='\\');
+}
+
+int GUI::TypeField::getNextBlock(const char* _str, int _len) const {
+    int i=0;
+    if (isSpec(_str[0])) {
+        // Move by spaces
+        for (;isSpec(_str[i])&&(i<_len);++i) {}
+    } else {
+        // Move by charachters
+        for (;!isSpec(_str[i])&&(i<_len);++i) {}
+    }
+    return i;
+}
+
+int GUI::TypeField::getPrevBlock(const char* _str, int _len) const {
+    int i=0;
+    if (isSpec(_str[-1])) {
+        // Move by spaces
+        for (;isSpec(_str[i-1])&&(i>_len);--i) {}
+    } else {
+        // Move by charachters
+        for (;!isSpec(_str[i-1])&&(i>_len);--i) {}
+    }
+    return i;
 }
 
 #endif  // (USE_SDL_FONT) && (PRELOAD_FONTS)

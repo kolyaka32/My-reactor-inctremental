@@ -31,6 +31,10 @@ float Mouse::getY() const {
     return position.y;
 }
 
+SDL_FPoint Mouse::getPos() const {
+    return position;
+}
+
 SDL_MouseButtonFlags Mouse::getState() const {
     return state;
 }

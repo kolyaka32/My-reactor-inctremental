@@ -13,13 +13,13 @@
 // Base cycle for use in any game mode
 class BaseCycle : public CycleTemplate {
  protected:
-    SettingsMenu settings;  // Menu for change settings
-    GUI::ImageButton exitButton;  // Button for exit from mode
+    SettingsMenu settings;
 
  public:
     BaseCycle(Window& _window);
     bool inputMouseDown() override;
-    void update() override;
     void inputMouseUp() override;
-    void inputMouseWheel(float _wheelY) override;
+    bool inputKeys(SDL_Keycode key) override;
+    bool inputMouseWheel(float wheelY) override;
+    void update() override;
 };

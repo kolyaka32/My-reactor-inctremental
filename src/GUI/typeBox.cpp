@@ -8,29 +8,30 @@
 #if (USE_SDL_FONT) && (PRELOAD_FONTS)
 
 
-template <unsigned bufferSize>
-GUI::TypeBox<bufferSize>::TypeBox(const Window& _window, float _posX, float _posY, const char *_startText,
-    float _height, Aligment _aligment, unsigned _frameWidth, Color _textColor)
-: TypeField<bufferSize>(_window, _posX, _posY, _startText, _height, _aligment, _textColor),
-backplate(_window, {_posX*_window.getWidth() - (6.5f*bufferSize+2), _posY*_window.getHeight()-_height*0.85f,
-    13.0f * bufferSize+4, _height * 1.8f}, 2) {}
+GUI::TypeBox::TypeBox(const Window& _window, const TextArgument&& _arg,
+    size_t _len, const char *_startText) noexcept
+: TypeField(_window, std::move(_arg), _len, _startText),
+backplate(_window, {_arg.X*_window.getWidth()-(13*_len-2)*(int)_arg.horAli/2-4,
+    _arg.Y*_window.getHeight()-_arg.height*0.85f, 13.0f*_len+4, _arg.height*1.75f}, 2, _arg.backColor, _arg.textColor) {}
 
-template <unsigned bufferSize>
-GUI::TypeBox<bufferSize>::TypeBox(TypeBox&& _object) noexcept
-: TypeField<bufferSize>(std::move(_object)),
+GUI::TypeBox::TypeBox(TypeBox&& _object) noexcept
+: TypeField(std::move(_object)),
 backplate(std::move(_object.backplate)) {}
 
-template <unsigned bufferSize>
-void GUI::TypeBox<bufferSize>::blit() const {
+void GUI::TypeBox::move(float _X, float _Y) {
+    TypeField::move(_X, _Y);
+    backplate.move(_X, _Y);
+}
+
+void GUI::TypeBox::blit() const {
     // Rendering background picture for better typing
     backplate.blit();
 
     // Rendering text
-    TypeField<bufferSize>::blit();
+    TypeField::blit();
 }
 
-template <unsigned bufferSize>
-bool GUI::TypeBox<bufferSize>::in(const Mouse _mouse) const {
+bool GUI::TypeBox::in(const Mouse _mouse) const {
     return backplate.in(_mouse);
 }
 

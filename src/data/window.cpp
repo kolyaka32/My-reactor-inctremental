@@ -8,10 +8,12 @@
 
 
 Window::Window(int _width, int _height, const LanguagedText _title)
-: width(_width),
+: displayID(getAvaliableID()),
+width(_width),
 height(_height),
-window(SDL_CreateWindow(titleText.getString().c_str(), width, height, 0)),
+window(SDL_CreateWindow(titleText.getString().c_str(), _width, _height, 0)),
 renderer(SDL_CreateRenderer(window, NULL)),
+scale(SDL_GetWindowDisplayScale(window)),
 #if (USE_SDL_IMAGE) && (PRELOAD_TEXTURES)
 textures{renderer},
 #endif
@@ -55,14 +57,34 @@ int Window::getHeight() const {
     return height;
 }
 
-void Window::setWidth(int _width) {
+void Window::setSize(int _width, int _height) {
     width = _width;
+    height = _height;
     SDL_SetWindowSize(window, width, height);
 }
 
-void Window::setHeight(int _height) {
-    height = _height;
-    SDL_SetWindowSize(window, width, height);
+SDL_DisplayID Window::getAvaliableID() const {
+    // Get avaliable
+    int count = 0;
+    SDL_DisplayID* idList = SDL_GetDisplays(&count);
+    if (count == 0) {
+        logger.important("Can't find avaliable screen");
+        return 0;
+    }
+    // Select first variant
+    SDL_DisplayID selectedID = idList[0];
+    SDL_free(idList);
+
+    return selectedID;
+}
+
+void Window::setFullscreen() {
+    SDL_SetWindowFullscreen(window, true);
+
+    // Get new sizes
+    const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displayID);
+    width = mode->w;
+    height = mode->h;
 }
 
 
@@ -212,10 +234,7 @@ SDL_Texture* Window::createTexture(Fonts _font, float _height, const char* _text
     SDL_Surface* surface = TTF_RenderText_Solid(getFont(_font), _text, _length, _color);
 
     // Creating texture from created surface
-    SDL_Texture* texture = createTexture(surface);
-
-    SDL_DestroySurface(surface);
-    return texture;
+    return createTextureAndFree(surface);
 }
 
 SDL_Texture* Window::createTexture(TTF_Font* _font, const char* _text, Color _color) const {
@@ -240,10 +259,24 @@ void Window::stopTextInput() const {
     SDL_StopTextInput(window);
 }
 
+void Window::setTitle(const LanguagedText newTitles) const {
+    updateTitle(newTitles.getString().c_str());
+}
+
 void Window::updateTitle(const char* _name) const {
     SDL_SetWindowTitle(window, _name);
 }
 
 void Window::updateTitle() const {
     updateTitle(titleText.getString().c_str());
+}
+
+void Window::showSaveFileDialog(SDL_DialogFileCallback _callback, const SDL_DialogFileFilter *_filters,
+    int _nfilters, const char* _default_location, void* _argument) const {
+    SDL_ShowSaveFileDialog(_callback, _argument, window, _filters, _nfilters, _default_location);
+}
+
+void Window::showOpenFileDialog(SDL_DialogFileCallback _callback, const SDL_DialogFileFilter *_filters,
+    int _nfilters, const char* _default_location, bool _allowMany, void* _argument) const {
+    SDL_ShowOpenFileDialog(_callback, _argument, window, _filters, _nfilters, _default_location, _allowMany);
 }

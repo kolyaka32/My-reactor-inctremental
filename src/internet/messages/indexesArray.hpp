@@ -8,8 +8,6 @@
 #include <array>
 #include <SDL3/SDL_stdinc.h>
 
-#if (USE_NET)
-
 
 // Class for work with indexes of last get message
 template <unsigned length>
@@ -25,5 +23,3 @@ class IndexesArray {
     bool isUnique(Uint8 index);
     void add(Uint8 index);
 };
-
-#endif  // (USE_NET)

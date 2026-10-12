@@ -15,16 +15,17 @@ GUI::Animation::Animation(const Window& _window, const SDL_FRect& _dest, Animati
 : TextureTemplate(_window, _dest),
 type(_type),
 animation(window.getAnimation(_type)),
+frame(0),
 prevTick(getTime() + animation->delays[0]) {
-    texture = _window.createTexture(animation->frames[0])
+    texture = _window.createTexture(animation->frames[0]);
 }
 
 GUI::Animation::Animation(Animation&& _object) noexcept
-: TextureTemplate(_object),
+: TextureTemplate(std::move(_object)),
 type(_object.type),
 animation(_object.animation),
 frame(_object.frame),
-prevTick(_object.type), {}
+prevTick(_object.prevTick) {}
 
 GUI::Animation::~Animation() noexcept {
     if (texture) {
