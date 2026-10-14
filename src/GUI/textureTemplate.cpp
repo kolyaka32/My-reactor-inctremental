@@ -28,12 +28,14 @@ void GUI::TextureTemplate::move(float _X, float _Y) {
     rect.y += _Y*window.getHeight();
 }
 
-// Template function for draw
 void GUI::TextureTemplate::blit() const {
     window.blit(texture, rect);
 }
 
-// Template function for check, if mouse press in object
+void GUI::TextureTemplate::blitFlipped() const {
+    window.blit(texture, 0.0f, rect, nullptr, SDL_FLIP_VERTICAL);
+}
+
 bool GUI::TextureTemplate::in(const Mouse mouse) const {
     return mouse.in(rect);
 }

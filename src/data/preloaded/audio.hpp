@@ -16,10 +16,11 @@ class Audio {
  private:
     // Output device
     SDL_AudioDeviceID audioDeviceID;
-    SDL_AudioDeviceID getAudioDeviceID();
     // Mixer for playing any audio
     MIX_Mixer* mixer;
-    MIX_Mixer* openMixer();
+
+    static SDL_AudioDeviceID getAudioDeviceID();
+    static MIX_Mixer* openMixer(SDL_AudioDeviceID deviceID);
 
  public:
     explicit Audio();
@@ -37,6 +38,10 @@ class Audio {
     // Set/get master volume: 1.0f - is normal
     void setVolume(float volume);
     float getVolume() const;
+
+ private:
+    // Not used
+    int nc;
 };
 
 // Global system for launch music tracks

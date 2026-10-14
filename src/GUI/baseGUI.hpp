@@ -64,6 +64,8 @@ namespace GUI {
         TextureTemplate(TextureTemplate&& object) noexcept;
         void move(float X, float Y) override;
         void blit() const override;
+        virtual void blitFlipped() const;
+        // Template function for check, if mouse press in object
         virtual bool in(const Mouse mouse) const;
     };
 
@@ -71,7 +73,7 @@ namespace GUI {
     // Class of rounded backplate for better understability
     class RoundedBackplate : public TextureTemplate {
      public:
-        RoundedBackplate(const Window& window, float centerX, float centerY, float width, float height,
+        RoundedBackplate(const Window& window, float X, float Y, float W, float H,
             int radius, int border, Color frontColor = GREY, Color backColor = BLACK) noexcept;
         RoundedBackplate(const Window& window, const SDL_FRect& rect, int radius, int border,
             Color frontColor = GREY, Color backColor = BLACK) noexcept;
@@ -83,13 +85,24 @@ namespace GUI {
     // Class with rectangular backplate for typeBox
     class RectBackplate : public TextureTemplate {
      public:
-        RectBackplate(const Window& window, float centerX, float centerY, float width, float height,
+        RectBackplate(const Window& window, float X, float Y, float W, float H,
             float border, Color frontColor = GREY, Color backColor = BLACK) noexcept;
         RectBackplate(const Window& window, const SDL_FRect& rect,
             float border, Color frontColor = GREY, Color backColor = BLACK) noexcept;
         RectBackplate(const RectBackplate& copyObject) noexcept;
         RectBackplate(RectBackplate&& moveObject) noexcept;
         ~RectBackplate() noexcept;
+    };
+
+
+    // Class for arrow for switchbox
+    class Arrow : public TextureTemplate {
+     public:
+        Arrow(const Window& window, float X, float Y, float H, Color color = BLACK) noexcept;
+        Arrow(const Window& window, const SDL_FRect& rect, Color color = BLACK) noexcept;
+        Arrow(const Arrow& copyObject) noexcept;
+        Arrow(Arrow&& moveObject) noexcept;
+        ~Arrow() noexcept;
     };
 
 
@@ -320,16 +333,15 @@ namespace GUI {
     // Object for selecting variants from list
     class SwitchBox : Template {
      private:
-        unsigned selected = 0;
-        bool opened = false;
+        unsigned selected;
+        bool opened;
 
         // Draw options
         const float height;
         SDL_FRect background;
         const SDL_Color backColor;
         std::vector<StaticText> drawnTexts;
-        SDL_Texture* arrowTexture;
-        SDL_FRect arrowRect;
+        Arrow arrow;
 
      public:
         SwitchBox(const Window& window, const TextArgument argument, float W,
@@ -337,7 +349,9 @@ namespace GUI {
         SwitchBox(SwitchBox&& object) noexcept;
         void set(unsigned value);
         unsigned getValue() const;
+
         Code click(const Mouse mouse);
+        Code press(SDL_Keycode code);
         void move(float X, float Y) override;
         void blit() const override;
     };
@@ -346,8 +360,8 @@ namespace GUI {
     // Class of appearing for time and hidden by time text
     class InfoBox : public StaticText {
      private:
-        timer endTime;  // Time, when stop showing
         const timer decayTime;  // Time of full decay
+        timer endTime;  // Time, when stop showing
 
      public:
         InfoBox(const Window& window, const LanguagedText&& texts,

@@ -23,7 +23,6 @@ class Window {
     const LanguagedText titleText;
     SDL_Window* window;
     SDL_Renderer* renderer;
-    float scale;
     #if (USE_SDL_IMAGE) && (PRELOAD_TEXTURES)
     // Preloaded textures
     const TexturesData textures;
@@ -36,9 +35,10 @@ class Window {
     // Preloaded fonts
     const FontsData fonts;
     #endif
+    float scale;
 
     // Find first avaliable 
-    SDL_DisplayID getAvaliableID() const;
+    static SDL_DisplayID getAvaliableID();
     // Set new title
     void updateTitle(const char* name) const;
 

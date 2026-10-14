@@ -31,7 +31,9 @@ GUI::RectBackplate::RectBackplate(const RectBackplate& _object) noexcept
 }
 
 GUI::RectBackplate::RectBackplate(RectBackplate&& _object) noexcept
-: TextureTemplate(std::move(_object)) {}
+: TextureTemplate(std::move(_object)) {
+    texture = nullptr;
+}
 
 GUI::RectBackplate::~RectBackplate() noexcept {
     if (texture) {

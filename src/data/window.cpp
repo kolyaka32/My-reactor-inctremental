@@ -11,9 +11,9 @@ Window::Window(int _width, int _height, const LanguagedText _title)
 : displayID(getAvaliableID()),
 width(_width),
 height(_height),
+titleText(_title),
 window(SDL_CreateWindow(titleText.getString().c_str(), _width, _height, 0)),
 renderer(SDL_CreateRenderer(window, NULL)),
-scale(SDL_GetWindowDisplayScale(window)),
 #if (USE_SDL_IMAGE) && (PRELOAD_TEXTURES)
 textures{renderer},
 #endif
@@ -23,7 +23,7 @@ fonts{},
 #if (USE_SDL_IMAGE) && (PRELOAD_ANIMATIONS)
 animations{},
 #endif
-titleText(_title) {
+scale(SDL_GetWindowDisplayScale(window)) {
     // Checking on correction of created objects
     #if (CHECK_CORRECTION)
     if (window == NULL) {
@@ -63,7 +63,7 @@ void Window::setSize(int _width, int _height) {
     SDL_SetWindowSize(window, width, height);
 }
 
-SDL_DisplayID Window::getAvaliableID() const {
+SDL_DisplayID Window::getAvaliableID() {
     // Get avaliable
     int count = 0;
     SDL_DisplayID* idList = SDL_GetDisplays(&count);

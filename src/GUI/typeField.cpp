@@ -34,11 +34,11 @@ length(_object.length),
 caret(_object.caret),
 needSwapCaret(_object.needSwapCaret),
 selectLength(_object.selectLength),
-showCaret(_object.showCaret),
 caretRect(_object.caretRect),
 inversedRectDest(_object.inversedRectDest),
 inversedRectSrc(_object.inversedRectSrc),
 inverseTexture(_object.inverseTexture),
+showCaret(_object.showCaret),
 pressed(_object.pressed),
 selected(_object.selected) {
     // Copying previous text
@@ -106,7 +106,7 @@ void GUI::TypeField::updateSelected() {
                 }
                 TTF_GetStringSize(font, buffer+caret, selectLength, &length, nullptr);
             } else {
-                if (-selectLength == caret) {
+                if (-selectLength == (int)caret) {
                     startPosition = 0;
                 } else {
                     TTF_GetStringSize(font, buffer, caret + selectLength, &startPosition, nullptr);
@@ -132,7 +132,7 @@ bool GUI::TypeField::writeString(const char* _str) {
 
     // Counting codepoints
     int codelen = 0;
-    for (int i=0; i < length;) {
+    for (size_t i=0; i < length;) {
         if (int len = getNextChar(buffer+i)) {
             codelen++;
             i += len;
@@ -145,7 +145,7 @@ bool GUI::TypeField::writeString(const char* _str) {
         // Check codepoint length
         if (int len = getNextChar(c)) {
             // Moving all after codepoint
-            for (int i = length; i > caret; --i) {
+            for (size_t i = length; i > caret; --i) {
                 buffer[i + len - 1] = buffer[i-1];
             }
             memcpy(buffer+caret, c, len);
@@ -153,7 +153,7 @@ bool GUI::TypeField::writeString(const char* _str) {
             caret += len;
             c += len;
             codelen++;
-            if (codelen == maxLength) {
+            if (codelen == (int)maxLength) {
                 break;
             }
         } else {
@@ -567,7 +567,7 @@ void GUI::TypeField::setString(const char* _newString) {
             c += len;
             // Check on max length
             codeCount++;
-            if (codeCount == maxLength) {
+            if (codeCount == (int)maxLength) {
                 break;
             }
         } else {

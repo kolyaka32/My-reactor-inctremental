@@ -17,14 +17,14 @@ holdingCell{},
 holdingCellRect{0.0f, 0.0f, cellRect.w, cellRect.h},
 panelBackplate(_window, _panelW/2, 0.5, _panelW, 1.0, 2.0, GREY, BLACK),
 modeText(_window, {"Show mode:", "Режим отображения:"}, {_panelW/2, 0.15, .frame=1}),
-modeSwitchBox(_window, {_panelW/2, 0.185}, 0.2, {{"Elements", "Элементы"}, {"Thermal", "Температурный"},
-    {"Pressure", "Давление"}}),
-pickedPressure(_window, {"Pressure:%6.1f", "Давление:%6.1f"},
+modeSwitchBox(_window, {_panelW/2, 0.185, .textColor = BLACK, .backColor = WHITE}, 0.14,
+    {{"Elements", "Элементы"}, {"Thermal", "Температурный"}, {"Pressure", "Давление"}}),
+pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
     {_panelW/4, 0.3, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
-pickedTemperature(_window, {"Temperature:%4.1f", "Температура:%4.1f"},
+pickedTemperature(_window, {"Temperature: %4.1f", "Температура: %4.1f"},
     {_panelW/4, 0.33, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
 buildText(_window, {"Build object:", "Объект постройки:"}, {_panelW/2, 0.5, .frame=1}),
-buildSwitchBox(_window, {_panelW/2, 0.535}, 0.2,
+buildSwitchBox(_window, {_panelW/2, 0.535, .textColor = BLACK, .backColor = WHITE}, 0.14,
     {{"Not selected", "Не выбран"}, {"Demplish", "Снести"}, {"Wall", "Стена"}, {"Vent", "Вентилятор"},
     {"Heater", "Нагреватель"}, {"Check valve", "Обратный клапан"}, {"Cooler", "Холодильник"}}),
 resetButton(_window, {"Reset", "Сброс"}, {_panelW/2, 0.8, .frame=1}) {}
@@ -40,7 +40,7 @@ bool BoardInteracter::click(const Mouse _mouse) {
     // Check, if in interface part
     if (panelBackplate.in(_mouse)) {
         // Check, if changing show mode
-        if (GUI::Code code = modeSwitchBox.click(_mouse)) {
+        if (modeSwitchBox.click(_mouse)) {
             showState = ShowState(modeSwitchBox.getValue());
             return true;
         }
@@ -105,6 +105,12 @@ bool BoardInteracter::scroll(const Mouse _mouse, float _wheelY) {
 }
 
 bool BoardInteracter::press(SDL_Keycode _key) {
+    if (modeSwitchBox.press(_key)) {
+        return true;
+    }
+    if (buildSwitchBox.press(_key)) {
+        return true;
+    }
     if (_key == SDLK_R) {
         // Check, if try rotate part
         holdingCell.rotate();

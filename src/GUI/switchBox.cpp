@@ -11,8 +11,11 @@
 GUI::SwitchBox::SwitchBox(const Window& _window, const TextArgument _arg, float _W,
     std::initializer_list<LanguagedText> _texts, unsigned _startOption) noexcept
 : Template(_window),
+selected(_startOption),
+opened(false),
 height(_arg.height*1.2f / _window.getHeight()),
-backColor(_arg.backColor) {
+backColor(_arg.backColor),
+arrow(_window, _arg.X-_W/2+height/2, _arg.Y, height, _arg.textColor) {
     // Setting background
     background = _arg.getRect(window, _W, height);
 
@@ -20,34 +23,11 @@ backColor(_arg.backColor) {
     int i=0;
     for (const LanguagedText* text=_texts.begin(); text != _texts.end(); ++text) {
         drawnTexts.emplace_back(_window, std::move(*text), std::move(_arg));
-        // Placing text
         drawnTexts[i].move(0.0, height*i);
         i++;
     }
-    // Updating start option
-    selected = _startOption;
-
-    // Creating arrow
-    arrowRect = {background.x+height*0.1f, background.y+height*0.15f, height*0.7f, height*0.7f};
-    arrowTexture = window.createTexture(arrowRect.w, arrowRect.h);
-    SDL_Vertex vertex[3] = {
-        {  // Down point
-            {_arg.X+arrowRect.w*0.5f, _arg.Y+arrowRect.h},
-            {0.0, 0.0, 0.0, 1.0},  // Black
-        },
-        {  // Left point
-            {_arg.X, _arg.Y},
-            {0.0, 0.0, 0.0, 1.0},  // Black
-        },
-        {  // Right point
-            {_arg.X+arrowRect.w, _arg.Y},
-            {0.0, 0.0, 0.0, 1.0},  // Black
-        },
-    };
-    window.setDrawColor(_arg.textColor);
-    window.setRenderTarget(arrowTexture);
-    window.drawGeometry(vertex, 3);
-    window.resetRenderTarget();
+    // Placing selected text
+    drawnTexts[selected].move(0.0, -height*selected);
 }
 
 GUI::SwitchBox::SwitchBox(SwitchBox&& _object) noexcept
@@ -55,11 +35,10 @@ GUI::SwitchBox::SwitchBox(SwitchBox&& _object) noexcept
 selected(_object.selected),
 opened(_object.opened),
 height(_object.height),
-backColor(_object.backColor),
 background(std::move(_object.background)),
+backColor(_object.backColor),
 drawnTexts(std::move(_object.drawnTexts)),
-arrowTexture(_object.arrowTexture),
-arrowRect(_object.arrowRect) {}
+arrow(std::move(_object.arrow)) {}
 
 void GUI::SwitchBox::set(unsigned _value) {
     if (opened) {
@@ -70,7 +49,6 @@ void GUI::SwitchBox::set(unsigned _value) {
     } else {
         // Resetting old option
         drawnTexts[selected].move(0.0, height*selected);
-
         // Moving new option
         selected = _value;
         drawnTexts[selected].move(0.0, -height*selected);
@@ -96,7 +74,7 @@ GUI::Code GUI::SwitchBox::click(const Mouse _mouse) {
         // Resetting to previous
         drawnTexts[selected].move(0.0, -height*selected);
         background.h = height * window.getHeight();
-        return None;
+        return Some;
     } else {
         if (_mouse.in(background)) {
             // Selecting variant
@@ -104,7 +82,19 @@ GUI::Code GUI::SwitchBox::click(const Mouse _mouse) {
             background.h = height * drawnTexts.size() * window.getHeight();
             // Resetting selected postion
             drawnTexts[selected].move(0.0, height*selected);
+            return Some;
         }
+    }
+    return None;
+}
+
+GUI::Code GUI::SwitchBox::press(SDL_Keycode _code) {
+    if (opened && _code == SDLK_ESCAPE) {
+        // Closing
+        opened = false;
+        drawnTexts[selected].move(0.0, -height*selected);
+        background.h = height * window.getHeight();
+        return Some;
     }
     return None;
 }
@@ -112,11 +102,10 @@ GUI::Code GUI::SwitchBox::click(const Mouse _mouse) {
 void GUI::SwitchBox::move(float _X, float _Y) {
     background.x += _X*window.getWidth();
     background.y += _Y*window.getHeight();
-    for (int i=0; i < drawnTexts.size(); ++i) {
+    for (size_t i=0; i < drawnTexts.size(); ++i) {
         drawnTexts[i].move(_X, _Y);
     }
-    arrowRect.x += _X*window.getWidth();
-    arrowRect.y += _Y*window.getHeight();
+    arrow.move(_X, _Y);
 }
 
 void GUI::SwitchBox::blit() const {
@@ -126,13 +115,13 @@ void GUI::SwitchBox::blit() const {
 
     // Draw open or close version depend on state
     if (opened) {
-        for (int i=0; i < drawnTexts.size(); ++i) {
+        for (size_t i=0; i < drawnTexts.size(); ++i) {
             drawnTexts[i].blit();
         }
-        window.blit(arrowTexture, 0.0f, arrowRect, nullptr, SDL_FLIP_VERTICAL);
+        arrow.blitFlipped();
     } else {
         drawnTexts[selected].blit();
-        window.blit(arrowTexture, arrowRect);
+        arrow.blit();
     }
 }
 
