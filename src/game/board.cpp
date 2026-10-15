@@ -54,7 +54,7 @@ float Board::getTemperature(SDL_Point _pos) const {
 
 void Board::update() {
     // Vertical interactions
-    for (int y=0; y < height-1; ++y) {
+    /*for (int y=0; y < height-1; ++y) {
         for (int x=0; x < width; ++x) {
             // Exchanging with cell bellow
             cells[y*width+x].exchange(cells[(y+1)*width+x]);
@@ -128,17 +128,17 @@ void Board::update() {
                 break;
             }
         }
-    }
+    }*/
 
     // Resetting side cells to global parameters
-    for (int y=0; y < height; ++y) {
+    /*for (int y=0; y < height; ++y) {
         cells[y*width].exchange();  // Left cells
         cells[y*width+width-1].exchange();  // Right cells
     }
     for (int x=1; x < width-1; ++x) {
         cells[x].exchange();  // Upper cells
         cells[height*width-x-1].exchange();  // Bottom cells
-    }
+    }*/
 }
 
 void Board::applyChanges() {

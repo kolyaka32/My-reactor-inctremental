@@ -24,14 +24,6 @@ const char* texturesFilesNames[unsigned(Textures::Count)] = {
     "img/GUI/Flag_RUS.png",
     //"img/GUI/Flag_GER.png",
     //"img/GUI/Flag_BEL.png",
-
-    // Game part
-    "img/game/wall.png",
-    "img/game/vent.png",
-    "img/game/heater.png",
-    "img/game/buldozer.png",
-    "img/game/checkValve.png",
-    "img/game/cooler.png",
 };
 
 Textures operator+(const Textures _color, int _offset) {

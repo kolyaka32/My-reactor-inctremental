@@ -17,7 +17,7 @@ enum class ShowState {
     Pressure,
 };
 
-// Class for interact with and visualise board
+// Interact tool with board
 class BoardInteracter : GUI::Template {
 private:
     static Board board;

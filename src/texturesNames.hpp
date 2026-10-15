@@ -27,14 +27,6 @@ enum class Textures : unsigned {
     //FlagGER,
     //FlagBEL,
 
-    // Main game part
-    Wall,
-    Vent,
-    Heater,
-    Buldozer,
-    Valve,
-    Cooler,
-
     // Global counter of all textures
     Count,
 };

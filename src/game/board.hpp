@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cell.hpp"
+#include "cellTexture.hpp"
 
 
 // Main object
@@ -29,6 +29,7 @@ class Board {
     void applyMass(SDL_Point pos, float deltaMass);
     void reduceMass(SDL_Point pos, float deltaMass);
     void applyTemperature(SDL_Point pos, float temperature);
+
     float getPressure(SDL_Point pos) const;
     float getTemperature(SDL_Point pos) const;
 
