@@ -14,6 +14,5 @@ private:
     /* data */
 
 public:
-    Channel(/* args */);
-    ~Channel();
+    Channel();
 };

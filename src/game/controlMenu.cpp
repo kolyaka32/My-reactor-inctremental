@@ -80,7 +80,7 @@ bool ControlMenu::press(SDL_Keycode _key) {
     }
     if (_key == SDLK_R) {
         // Check, if try rotate part
-        interacter.holdingCell.rotate();
+        // ! interacter.holdingCell.rotate();
         return true;
     }
     if (buildSwitchBox.press(_key)) {
@@ -90,6 +90,11 @@ bool ControlMenu::press(SDL_Keycode _key) {
 }
 
 void ControlMenu::update(const Mouse _mouse) {
+    // Moving
+    if (mousePress == SDL_BUTTON_MMASK) {
+        grid.update(_mouse.getX(), _mouse.getY());
+    }
+
     // Finding connected cell
     /*const SDL_FRect rect = grid.absolute(cellRect);
     SDL_Point position = {int((_mouse.getX()-rect.x)/rect.w + 1), int((_mouse.getY()-rect.y)/rect.h + 1)};
@@ -98,10 +103,6 @@ void ControlMenu::update(const Mouse _mouse) {
     if (buildSwitchBox.getValue() != 0) {
         holdingCellRect.x = _mouse.getX() - holdingCellRect.w/2;
         holdingCellRect.y = _mouse.getY() - holdingCellRect.h/2;
-    }
-
-    if (mousePress == SDL_BUTTON_MMASK) {
-        grid.update(_mouse.getX(), _mouse.getY());
     }
 
     // Finding connected cell

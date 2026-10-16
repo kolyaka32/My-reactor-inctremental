@@ -110,12 +110,16 @@ void Window::drawRect(const SDL_FRect& _rect) const {
     SDL_RenderFillRect(renderer, &_rect);
 }
 
-void Window::drawLine(float x1, float y1, float x2, float y2) const {
-    SDL_RenderLine(renderer, x1, y1, x2, y2);
+void Window::drawLine(SDL_FPoint _p1, SDL_FPoint _p2) const {
+    SDL_RenderLine(renderer, _p1.x, _p1.y, _p2.x, _p2.y);
 }
 
 void Window::drawGeometry(const SDL_Vertex* _vertices, int _numVer, SDL_Texture* _texture) const {
     SDL_RenderGeometry(renderer, _texture, _vertices, _numVer, nullptr, 0);
+}
+
+void Window::drawGeometry(const SDL_Vertex* _vertices, int _numVer, const int* _order, unsigned _orderLen, SDL_Texture* _texture) const {
+    SDL_RenderGeometry(renderer, _texture, _vertices, _numVer, _order, _orderLen);
 }
 
 
