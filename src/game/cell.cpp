@@ -125,28 +125,36 @@ void Cell::applyChanges() {
     temperature = newEnergy / mass / heatCapacity;
 }
 
-void Cell::blitThermal(const Window& _window, SDL_FRect _rect) const {
-    if (temperature < 300.0) {
-        // Cold spectre
-        _window.setDrawColor({0, 0, Uint8(255 - temperature*(255.0/300.0)), 255});
-    } else if (temperature < 300.0 + 255.0) {
-        // Warm spectre
-        _window.setDrawColor({Uint8(temperature-300.0), 0, 0, 255});
-    } else {
-        // Over hotx
-        _window.setDrawColor({255, 0, 0, 255});
-    }
-    _window.drawRect(_rect);
+SDL_FColor Cell::getNormalColor() const {
+    // Normal color map
+    return {0.6, 0.6, 0.6, 1.0};
 }
 
-void Cell::blitPressure(const Window& _window, SDL_FRect _rect) const {
+SDL_FColor Cell::getThermalColor() const {
+    constexpr float drawTemperatureKoef = 256.0;
+
+    if (temperature < 300.0) {
+        // Cold spectre
+        return {0.0, 0.0, 1.0f - temperature/300.0f, 1.0};
+    } else if (temperature < 300.0 + drawTemperatureKoef) {
+        // Warm spectre
+        return {(temperature-300.0f)/drawTemperatureKoef, 0.0, 0.0, 1.0};
+    }
+    // Too hot
+    return {1.0, 0.0, 0.0, 1.0};
+}
+
+SDL_FColor Cell::getPressureColor() const {
     float pressure = getPressure();
 
     // Doesn't check less then 0
+    constexpr float drawPressureKoef = 1.0;
     if (pressure > 255/drawPressureKoef) {
-        _window.setDrawColor({0, 0, 255, 255});
-    } else {
-        _window.setDrawColor({0, 0, Uint8(pressure*drawPressureKoef), 255});
+        return {1.0, 1.0, 1.0, 1.0};
     }
-    _window.drawRect(_rect);
+    return {1.0, 1.0, pressure*drawPressureKoef, 1.0};
+}
+
+SDL_FColor Cell::getRandomColor() const {
+    return {SDL_randf(), SDL_randf(), SDL_randf()};
 }

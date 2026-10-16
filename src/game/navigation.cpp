@@ -6,17 +6,14 @@
 #include "navigation.hpp"
 
 
-// Static objects
-Grid grid;
-
 Grid::Grid() {
     reset();
 }
 
 void Grid::reset() {
-    centerX = 0;
-    centerY = 0;
-    scale = 1;
+    centerX = 500.0;
+    centerY = 100.0;
+    scale = 1.0;
 }
 
 void Grid::update(float mouseX, float mouseY) {

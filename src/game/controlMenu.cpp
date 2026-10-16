@@ -12,7 +12,7 @@ interacter(_interacter),
 panelBackplate(_window, _panelW/2, 0.5, _panelW, 1.0, 2.0, GREY, BLACK),
 modeText(_window, {"Show mode:", "Режим отображения:"}, {_panelW/2, 0.15, .frame=1}),
 modeSwitchBox(_window, {_panelW/2, 0.185, .textColor = BLACK, .backColor = WHITE}, 0.14,
-    {{"Elements", "Элементы"}, {"Thermal", "Температурный"}, {"Pressure", "Давление"}}),
+    {{"Elements", "Элементы"}, {"Thermal", "Температурный"}, {"Pressure", "Давление"}, {"Random", "Случайные"}}),
 pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
     {_panelW/4, 0.3, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
 pickedTemperature(_window, {"Temperature: %4.1f", "Температура: %4.1f"},
@@ -55,7 +55,7 @@ bool ControlMenu::click(const Mouse _mouse) {
 
     // Start camera movement
     if (mousePress == SDL_BUTTON_MMASK) {
-        grid.click(_mouse.getX(), _mouse.getY());
+        interacter.grid.click(_mouse.getX(), _mouse.getY());
         return true;
     }
     return false;
@@ -67,7 +67,7 @@ void ControlMenu::unclick(const Mouse _mouse) {
 }
 
 bool ControlMenu::scroll(const Mouse _mouse, float _wheelY) {
-    grid.zoom(_wheelY, _mouse);
+    interacter.grid.zoom(_wheelY, _mouse);
     return true;
 }
 
@@ -92,7 +92,7 @@ bool ControlMenu::press(SDL_Keycode _key) {
 void ControlMenu::update(const Mouse _mouse) {
     // Moving
     if (mousePress == SDL_BUTTON_MMASK) {
-        grid.update(_mouse.getX(), _mouse.getY());
+        interacter.grid.update(_mouse.getX(), _mouse.getY());
     }
 
     // Finding connected cell

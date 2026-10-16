@@ -37,5 +37,3 @@ class Grid {
     SDL_FPoint local(const Mouse mouse) const;
     SDL_FRect local(SDL_FRect absolute) const;
 };
-
-extern Grid grid;

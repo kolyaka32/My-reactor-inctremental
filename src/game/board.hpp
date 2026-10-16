@@ -13,8 +13,8 @@
 class Board {
  private:
     // Lengthes of field (with side cells)
-    static const int height = 5;
-    static const int width  = 6;
+    static const int height = 100;
+    static const int width  = 100;
     // Main array of cells
     Cell cells[height*width];
     // Main array of chanels between cells

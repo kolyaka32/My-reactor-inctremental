@@ -8,7 +8,6 @@
 #include "../GUI/baseGUI.hpp"
 #include "board.hpp"
 #include "navigation.hpp"
-#include "cellTexture.hpp"
 
 
 // Possible states of current showing
@@ -16,6 +15,7 @@ enum class ShowState {
     Normal,
     Thermal,
     Pressure,
+    Random,
 };
 
 // Interact tool with board
@@ -24,13 +24,12 @@ private:
     Board board;
     ShowState showState;
 
-    // Rects of local positions of board
-    const SDL_FRect cellRect;
-
-    // ! Check, if required
-    CellTexture texture;
+    // Draw rects in local positions
+    SDL_FRect oddRect, evenRect;
 
     // Draw different modes/parts
+    void blitUnit(SDL_FRect rect, SDL_FColor color) const;
+    void blitBlock(SDL_FRect startRect, int offset) const;
     void blitLines() const;
 
 public:
@@ -41,6 +40,7 @@ public:
     void update();
 
     // Interaction
+    Grid grid;
     // ! change to own class
     Cell holdingCell;
     SDL_FRect holdingCellRect;

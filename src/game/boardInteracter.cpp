@@ -8,10 +8,10 @@
 
 BoardInteracter::BoardInteracter(const Window& _window)
 : Template(_window),
-cellRect{0.5f*_window.getWidth(), 0.5f*_window.getHeight(), 40.0f, 40.0f},
-texture(_window, 60.0, GREY, BLACK),
-holdingCell{},
-holdingCellRect{0.0f, 0.0f, cellRect.w, cellRect.h} {}
+oddRect{0.0, 0.0, 200.0f/SDL_sqrtf(3), 100.0},
+evenRect{oddRect.w*3/4, oddRect.h/2, oddRect.w, oddRect.h},
+grid(),
+holdingCell{} {}
 
 void BoardInteracter::reset() {
     board.reset();
@@ -28,36 +28,55 @@ void BoardInteracter::update() {
     //board.applyChanges();
 }
 
-void BoardInteracter::blit() const {
-    // Draw odd cells
-    SDL_FRect rect1 = grid.absolute(texture.getRect());
-    float startY1 = rect1.y;
-    for (int x=0; x < board.getWidth(); ++x) {
-        rect1.y = startY1;
-        for (int y=0; y < board.getHeight()/2; ++y) {
-            //board[2*x]
-            texture.blit(rect1);
-            rect1.y += rect1.h;
-        }
-        rect1.x += rect1.w * 1.5;
-    }
+void BoardInteracter::blitUnit(SDL_FRect _rect, SDL_FColor _color) const {
+    SDL_Vertex vertexes[] = {
+        {{_rect.x+_rect.w/4,   _rect.y},           _color},
+        {{_rect.x+_rect.w*3/4, _rect.y},           _color},
+        {{_rect.x,             _rect.y+_rect.h/2}, _color},
+        {{_rect.x+_rect.w,     _rect.y+_rect.h/2}, _color},
+        {{_rect.x+_rect.w/4,   _rect.y+_rect.h},   _color},
+        {{_rect.x+_rect.w*3/4, _rect.y+_rect.h},   _color},
+    };
+    int order[] = {0, 1, 2,    1, 2, 3,    2, 3, 4,    3, 4, 5};
 
-    // Draw even cells
-    SDL_FRect rect2 = grid.absolute(texture.getRect());
-    float startY2 = rect2.y + rect2.h/2;
-    rect2.x += rect2.w*3/4;
-    for (int x=0; x < board.getWidth(); ++x) {
-        rect2.y = startY2;
-        for (int y=0; y < board.getHeight()/2; ++y) {
-            texture.blit(rect2);
-            rect2.y += rect2.h;
-        }
-        rect2.x += rect2.w * 1.5;
-    }
+    window.drawGeometry(vertexes, SDL_arraysize(vertexes), order, SDL_arraysize(order));
+}
 
-    blitLines();
+void BoardInteracter::blitBlock(SDL_FRect _rect, int _offset) const {
+    SDL_FRect rect = grid.absolute(_rect);
+    float startY = rect.y;
+    for (int x=_offset; x < board.getWidth(); x+=2) {
+        rect.y = startY;
+        for (int y=0; y < board.getHeight(); ++y) {
+            switch (showState) {
+            case ShowState::Thermal:
+                blitUnit(rect, board[{x, y}].getThermalColor());
+                break;
+
+            case ShowState::Pressure:
+                blitUnit(rect, board[{x, y}].getPressureColor());
+                break;
+
+            case ShowState::Random:
+                blitUnit(rect, board[{x, y}].getRandomColor());
+                break;
+
+            default:
+                blitUnit(rect, board[{x, y}].getNormalColor());
+                break;
+            }
+            rect.y += rect.h;
+        }
+        rect.x += rect.w * 1.5;
+    }
 }
 
 void BoardInteracter::blitLines() const {
     // !
+}
+
+void BoardInteracter::blit() const {
+    blitBlock(oddRect, 0);
+    blitBlock(evenRect, 1);
+    blitLines();
 }

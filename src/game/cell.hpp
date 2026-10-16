@@ -24,8 +24,6 @@ private:
     static constexpr float volume = 1.0;         // [m^3]
     static constexpr float pressureKoef = 0.01;  // [1]
     static constexpr float heatCapacity = 1.0;   // [J/kg/K]
-    static constexpr float drawTemperatureKoef = 2.5;
-    static constexpr float drawPressureKoef = 1.0;
 
     float getMassFlow(const Cell& second, float power = 0.0) const;
 
@@ -53,6 +51,8 @@ public:
     void applyChanges();  // Apply accumulated per exchanges changes
 
     // Drawing
-    void blitThermal(const Window& window, SDL_FRect rect) const;
-    void blitPressure(const Window& window, SDL_FRect rect) const;
+    SDL_FColor getNormalColor() const;
+    SDL_FColor getThermalColor() const;
+    SDL_FColor getPressureColor() const;
+    SDL_FColor getRandomColor() const;
 };
