@@ -17,18 +17,23 @@ void Board::reset() {
 }
 
 int Board::getWidth() const {
-    return width-2;
+    return width;
 }
 
 int Board::getHeight() const {
-    return height-2;
+    return height;
 }
 
-void Board::setCell(SDL_Point _pos, const Cell _cell) {
-    cells[_pos.y*width+_pos.x].state = _cell.state;
+bool Board::isLegimate(SDL_Point _pos) const {
+    return _pos.x > 0 && _pos.x <= width &&
+        _pos.y > 0 && _pos.y <= height;  // ! Check end positions
 }
 
-void Board::resetCell(SDL_Point _pos) {
+const Cell& Board::operator[](SDL_Point _pos) const {
+    return cells[_pos.y*width+_pos.x];
+}
+
+/*void Board::resetCell(SDL_Point _pos) {
     cells[_pos.y*width+_pos.x].reset();
 }
 
@@ -50,7 +55,7 @@ float Board::getPressure(SDL_Point _pos) const {
 
 float Board::getTemperature(SDL_Point _pos) const {
     return cells[_pos.y*width+_pos.x].getTemperature();
-}
+}*/
 
 void Board::update() {
     // Vertical interactions
@@ -69,67 +74,6 @@ void Board::update() {
         }
     }
 
-    // Updating cells by it special behevior
-    for (int y=1; y < height-1; ++y) {
-        for (int x=1; x < width-1; ++x) {
-            switch (cells[y*width+x].state) {
-            case Cell::VentUp:
-                cells[y*width+x].vent(cells[(y+1)*width+x], cells[(y-1)*width+x]);
-                break;
-
-            case Cell::VentRight:
-                cells[y*width+x].vent(cells[y*width+x-1], cells[y*width+x+1]);
-                break;
-
-            case Cell::VentDown:
-                cells[y*width+x].vent(cells[(y-1)*width+x], cells[(y+1)*width+x]);
-                break;
-
-            case Cell::VentLeft:
-                cells[y*width+x].vent(cells[y*width+x+1], cells[y*width+x-1]);
-                break;
-
-            case Cell::Heater:
-                cells[y*width+x].applyTemperature(1.0);
-
-            case Cell::ValveUp:
-                cells[y*width+x].exchangeValved(cells[(y+1)*width+x], cells[(y-1)*width+x]);
-                break;
-
-            case Cell::ValveRight:
-                cells[y*width+x].exchangeValved(cells[y*width+x-1], cells[y*width+x+1]);
-                break;
-
-            case Cell::ValveDown:
-                cells[y*width+x].exchangeValved(cells[(y-1)*width+x], cells[(y+1)*width+x]);
-                break;
-
-            case Cell::ValveLeft:
-                cells[y*width+x].exchangeValved(cells[y*width+x+1], cells[y*width+x-1]);
-                break;
-
-            case Cell::CoolerUp:
-                cells[y*width+x].cool(cells[(y+1)*width+x], cells[(y-1)*width+x]);
-                break;
-
-            case Cell::CoolerRight:
-                cells[y*width+x].cool(cells[y*width+x-1], cells[y*width+x+1]);
-                break;
-
-            case Cell::CoolerDown:
-                cells[y*width+x].cool(cells[(y-1)*width+x], cells[(y+1)*width+x]);
-                break;
-
-            case Cell::CoolerLeft:
-                cells[y*width+x].cool(cells[y*width+x+1], cells[y*width+x-1]);
-                break;
-
-            default:
-                break;
-            }
-        }
-    }*/
-
     // Resetting side cells to global parameters
     /*for (int y=0; y < height; ++y) {
         cells[y*width].exchange();  // Left cells
@@ -141,7 +85,7 @@ void Board::update() {
     }*/
 }
 
-void Board::applyChanges() {
+/*void Board::applyChanges() {
     // Copying saved array to main
     for (int i=0; i < height*width; ++i) {
         cells[i].applyChanges();
@@ -201,4 +145,4 @@ void Board::blitLines(const Window& _window, SDL_FRect _cellRect) const {
         _window.drawLine(_cellRect.x, y, oppositeP.x, y);
         y += _cellRect.h;
     }
-}
+}*/

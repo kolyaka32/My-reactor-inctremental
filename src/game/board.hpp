@@ -5,41 +5,31 @@
 
 #pragma once
 
-#include "cellTexture.hpp"
+#include "cell.hpp"
+#include "channel.hpp"
 
 
 // Main object
 class Board {
  private:
     // Lengthes of field (with side cells)
-    static const int height = 20;
-    static const int width  = 20;
+    static const int height = 5;
+    static const int width  = 6;
     // Main array of cells
     Cell cells[height*width];
+    // Main array of chanels between cells
+    Channel verChanels[(height+1)*width];
+    Channel upLeftChanels[height*width];  // ! Fix
+    Channel downLeftChanels[height*width];  // ! Fix
 
  public:
     Board();
     void reset();
     int getWidth() const;
     int getHeight() const;
+    bool isLegimate(SDL_Point pos) const;
 
-    // Interaction
-    void setCell(SDL_Point pos, const Cell cell);
-    void resetCell(SDL_Point pos);
-    void applyMass(SDL_Point pos, float deltaMass);
-    void reduceMass(SDL_Point pos, float deltaMass);
-    void applyTemperature(SDL_Point pos, float temperature);
-
-    float getPressure(SDL_Point pos) const;
-    float getTemperature(SDL_Point pos) const;
-
-    // Every cycle update
     void update();
-    void applyChanges();
 
-    // Draw different modes/parts
-    void blitNormal(const Window& window, SDL_FRect cellRect) const;
-    void blitThermal(const Window& window, SDL_FRect cellRect) const;
-    void blitPressure(const Window& window, SDL_FRect cellRect) const;
-    void blitLines(const Window& window, SDL_FRect cellRect) const;
+    const Cell& operator[](SDL_Point point) const;
 };

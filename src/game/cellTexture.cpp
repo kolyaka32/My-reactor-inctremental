@@ -7,10 +7,11 @@
 
 
 CellTexture::CellTexture(const Window& _window, float _side, Color _center, Color _border)
-: window(_window) {
+: window(_window),
+side(_side),
+height(_side*SDL_sqrtf(3)) {
     // Create texture
-    float height = _side*SDL_sqrtf(3);
-    texture = window.createTexture(height, _side);
+    texture = window.createTexture(height, side);
     window.setRenderTarget(texture);
 
     // Inner part
@@ -24,10 +25,10 @@ CellTexture::CellTexture(const Window& _window, float _side, Color _center, Colo
     SDL_Vertex vertexes[] = {
         {{height/4,   0}, color},
         {{height*3/4, 0}, color},
-        {{0,          _side/2}, color},
-        {{height,     _side/2}, color},
-        {{height/4,   _side}, color},
-        {{height*3/4, _side}, color},
+        {{0,          side/2}, color},
+        {{height,     side/2}, color},
+        {{height/4,   side}, color},
+        {{height*3/4, side}, color},
     };
 
     // External frame
@@ -50,7 +51,10 @@ CellTexture::~CellTexture() {
     SDL_DestroyTexture(texture);
 }
 
-void CellTexture::blit(const SDL_FPoint p) const {
-    SDL_FRect rect = {p.x, p.y, float(texture->w), float(texture->h)};
-    window.blit(texture, rect);
+SDL_FRect CellTexture::getRect() const {
+    return SDL_FRect{0.0, 0.0, height, side};
+}
+
+void CellTexture::blit(SDL_FRect _rect) const {
+    window.blit(texture, _rect);
 }

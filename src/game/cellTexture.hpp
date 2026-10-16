@@ -13,9 +13,13 @@ class CellTexture {
 private:
     const Window& window;
     SDL_Texture* texture;
+    const float side;
+    const float height;
 
 public:
     CellTexture(const Window& window, float side, Color center, Color border);
     ~CellTexture();
-    void blit(const SDL_FPoint p) const;
+
+    SDL_FRect getRect() const;
+    void blit(SDL_FRect p) const;
 };

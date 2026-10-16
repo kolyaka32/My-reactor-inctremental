@@ -8,7 +8,8 @@
 
 GameCycle::GameCycle(Window& _window)
 : BaseCycle(_window),
-board(_window, 0.26, 0.05, 0.25) {
+board(_window),
+menu(_window, 0.26, 0.05, 0.25, board) {
     if (!isRestarted()) {
         // Resetting field
         board.reset();
@@ -20,27 +21,27 @@ bool GameCycle::inputMouseDown() {
     if (BaseCycle::inputMouseDown()) {
         return true;
     }
-    board.click(mouse);
+    menu.click(mouse);
     return false;
 }
 
 void GameCycle::inputMouseUp() {
     BaseCycle::inputMouseUp();
-    board.unclick(mouse);
+    menu.unclick(mouse);
 }
 
 bool GameCycle::inputMouseWheel(float _wheelY) {
     if (BaseCycle::inputMouseWheel(_wheelY)) {
         return true;
     }
-    if (board.scroll(mouse, _wheelY)) {
+    if (menu.scroll(mouse, _wheelY)) {
         return true;
     }
     return false;
 }
 
 bool GameCycle::inputKeys(SDL_Keycode _key) {
-    if (board.press(_key)) {
+    if (menu.press(_key)) {
         return true;
     }
     if (BaseCycle::inputKeys(_key)) {
@@ -52,7 +53,8 @@ bool GameCycle::inputKeys(SDL_Keycode _key) {
 void GameCycle::update() {
     mouse.updatePos();
     BaseCycle::update();
-    board.update(mouse);
+    menu.update(mouse);
+    board.update();
 }
 
 void GameCycle::draw() const {
@@ -62,6 +64,8 @@ void GameCycle::draw() const {
 
     // Blitting field
     board.blit();
+
+    menu.blit();
 
     // Drawing upper dashboard
     settings.blit();

@@ -11,8 +11,6 @@
 //
 class Cell {
  protected:
-    // ! Add walls
-
     // Physic part
     Gase gase;
 

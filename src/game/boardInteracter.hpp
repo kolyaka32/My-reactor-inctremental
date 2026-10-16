@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include "../GUI/interface.hpp"
-#include "navigation.hpp"
+#include "../GUI/baseGUI.hpp"
 #include "board.hpp"
+#include "navigation.hpp"
+#include "cellTexture.hpp"
 
 
 // Possible states of current showing
@@ -18,40 +19,33 @@ enum class ShowState {
 };
 
 // Interact tool with board
-class BoardInteracter : GUI::Template {
+class BoardInteracter : public GUI::Template {
 private:
-    static Board board;
-    static ShowState showState;
-    int mousePress;  // State for pressing mouse from SDL_MouseButtonFlags
+    Board board;
+    ShowState showState;
 
     // Rects of local positions of board
     const SDL_FRect cellRect;
 
-    // Selected object
+    // ! Check, if required
+    CellTexture texture;
+
+    // Draw different modes/parts
+    void blitLines() const;
+
+public:
+    BoardInteracter(const Window& window);
+
+    // Interacting with scale and position
+    void reset();
+    void update();
+
+    // Interaction
+    // ! change to own class
     Cell holdingCell;
     SDL_FRect holdingCellRect;
 
-    // Graphical part
-    GUI::RectBackplate panelBackplate;
-    GUI::StaticText modeText;
-    GUI::SwitchBox modeSwitchBox;
-    GUI::DynamicText pickedPressure;
-    GUI::DynamicText pickedTemperature;
-    GUI::StaticText buildText;
-    GUI::SwitchBox buildSwitchBox;
-    GUI::TextButton resetButton;
-
-public:
-    BoardInteracter(const Window& window, float boardX, float boardY, float panelW);
-
-    void reset();
-
-    // Interacting with scale and position
-    bool click(const Mouse mouse);
-    void unclick(const Mouse mouse);
-    bool scroll(const Mouse mouse, float wheelY);
-    bool press(SDL_Keycode key);
-    void update(const Mouse mouse);
+    void setShowState(unsigned state);
 
     void blit() const;
 };

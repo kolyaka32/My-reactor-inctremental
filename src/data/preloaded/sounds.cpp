@@ -80,7 +80,7 @@ void SoundsData::play(Sounds _index) const {
 }
 
 void SoundsData::setVolume(float _volume) {
-    for (int i=0; i < unsigned(Sounds::Count); ++i) {
+    for (unsigned i=0; i < unsigned(Sounds::Count); ++i) {
         MIX_SetTrackGain(tracks[i], _volume);
     }
 }

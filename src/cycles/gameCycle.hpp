@@ -7,6 +7,7 @@
 
 #include "baseCycle.hpp"
 #include "../game/boardInteracter.hpp"
+#include "../game/controlMenu.hpp"
 
 
 // Cycle with game
@@ -14,8 +15,9 @@ class GameCycle : public BaseCycle {
  protected:
     // Active game part
     BoardInteracter board;
+    ControlMenu menu;
 
-    // New overrided cycle functions
+    // Overrided cycle functions
     bool inputMouseDown() override;
     void inputMouseUp() override;
     bool inputMouseWheel(float wheelY) override;
