@@ -12,32 +12,18 @@ Window::Window(int _width, int _height, const LanguagedText _title)
 width(_width),
 height(_height),
 titleText(_title),
-window(SDL_CreateWindow(titleText.getString().c_str(), _width, _height, 0)),
-renderer(SDL_CreateRenderer(window, NULL)),
+window(createWindow(_width, _height, _title)),
+renderer(createRenderer(window)),
 #if (USE_SDL_IMAGE) && (PRELOAD_TEXTURES)
-textures{renderer},
+textures(renderer),
 #endif
 #if (USE_SDL_FONT) && (PRELOAD_FONTS)
-fonts{},
+fonts(),
 #endif
 #if (USE_SDL_IMAGE) && (PRELOAD_ANIMATIONS)
-animations{},
+animations(),
 #endif
-scale(SDL_GetWindowDisplayScale(window)) {
-    // Checking on correction of created objects
-    #if (CHECK_CORRECTION)
-    if (window == NULL) {
-        logger.important("Can't create window");
-    }
-    #endif
-
-    // Creating renderer from window
-    #if (CHECK_CORRECTION)
-    if (renderer == NULL) {
-        logger.important("Can't create renderer");
-    }
-    #endif
-}
+scale(SDL_GetWindowDisplayScale(window)) {}
 
 Window::~Window() noexcept {
     // Destroying renderer
@@ -57,12 +43,6 @@ int Window::getHeight() const {
     return height;
 }
 
-void Window::setSize(int _width, int _height) {
-    width = _width;
-    height = _height;
-    SDL_SetWindowSize(window, width, height);
-}
-
 SDL_DisplayID Window::getAvaliableID() {
     // Get avaliable
     int count = 0;
@@ -76,6 +56,29 @@ SDL_DisplayID Window::getAvaliableID() {
     SDL_free(idList);
 
     return selectedID;
+}
+
+SDL_Window* Window::createWindow(int _width, int _height, const LanguagedText _title) {
+    SDL_Window* window = SDL_CreateWindow(_title.getString().c_str(), _width, _height, 0);
+    if (window == nullptr) {
+        logger.important("Can't create window");
+    }
+    return window;
+}
+
+SDL_Renderer* Window::createRenderer(SDL_Window* _window) {
+    // Create renderer from window
+    SDL_Renderer* renderer = SDL_CreateRenderer(_window, nullptr);
+    if (renderer == nullptr) {
+        logger.important("Can't create renderer");
+    }
+    return renderer;
+}
+
+void Window::setSize(int _width, int _height) {
+    width = _width;
+    height = _height;
+    SDL_SetWindowSize(window, width, height);
 }
 
 void Window::setFullscreen() {

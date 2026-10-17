@@ -6,8 +6,24 @@
 #include "board.hpp"
 
 
-Board::Board() {
+Board::Board(unsigned _width, unsigned _height) noexcept
+: height(_height),
+width(_width) {
+    // Allocating arrays
+    cells = new Cell[height*width];
+    verChanels = new Channel[(height+1)*width];
+    // ! Recalc
+    upLeftChanels = new Channel[(height+1)*width];
+    downLeftChanels = new Channel[(height+1)*width];
+
     reset();
+}
+
+Board::~Board() noexcept {
+    delete[] cells;
+    delete[] verChanels;
+    delete[] upLeftChanels;
+    delete[] downLeftChanels;
 }
 
 void Board::reset() {

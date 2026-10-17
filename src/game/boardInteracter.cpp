@@ -8,6 +8,7 @@
 
 BoardInteracter::BoardInteracter(const Window& _window)
 : Template(_window),
+board(4, 4),
 oddRect{0.0, 0.0, 200.0f/SDL_sqrtf(3), 100.0},
 evenRect{oddRect.w*3/4, oddRect.h/2, oddRect.w, oddRect.h},
 grid(),
@@ -76,6 +77,7 @@ void BoardInteracter::blitLines() const {
 }
 
 void BoardInteracter::blit() const {
+    // ! Should get borders to less drowing
     blitBlock(oddRect, 0);
     blitBlock(evenRect, 1);
     blitLines();

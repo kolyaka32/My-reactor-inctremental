@@ -13,23 +13,26 @@
 class Board {
  private:
     // Lengthes of field (with side cells)
-    static const int height = 100;
-    static const int width  = 100;
+    const int height;
+    const int width;
     // Main array of cells
-    Cell cells[height*width];
+    Cell* cells;
     // Main array of chanels between cells
-    Channel verChanels[(height+1)*width];
-    Channel upLeftChanels[height*width];  // ! Fix
-    Channel downLeftChanels[height*width];  // ! Fix
+    Channel* verChanels;
+    Channel* upLeftChanels;
+    Channel* downLeftChanels;
 
  public:
-    Board();
+    Board(unsigned width, unsigned height) noexcept;
+    Board(const Board& board) = delete;
+    Board(Board&& board) = delete;
+    ~Board() noexcept;
+
+    // Interaction
     void reset();
     int getWidth() const;
     int getHeight() const;
     bool isLegimate(SDL_Point pos) const;
-
-    void update();
-
     const Cell& operator[](SDL_Point point) const;
+    void update();
 };

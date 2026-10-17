@@ -37,8 +37,10 @@ class Window {
     #endif
     float scale;
 
-    // Find first avaliable 
+    // Find first avaliable window ID
     static SDL_DisplayID getAvaliableID();
+    static SDL_Window* createWindow(int width, int height, const LanguagedText title);
+    static SDL_Renderer* createRenderer(SDL_Window* window);
     // Set new title
     void updateTitle(const char* name) const;
 
