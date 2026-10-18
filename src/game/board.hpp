@@ -34,5 +34,8 @@ class Board {
     int getHeight() const;
     bool isLegimate(SDL_Point pos) const;
     const Cell& operator[](SDL_Point point) const;
-    void update();
+    // Calculations
+    void applyForces();
+    void project();
+    void advect();  // Actual fluid transfer
 };
