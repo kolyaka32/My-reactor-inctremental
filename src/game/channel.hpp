@@ -15,4 +15,9 @@ private:
 
 public:
     Channel();
+    void reset();
+
+    bool wall;  // Is channel is accesible to change
+    float sp;  // Speed
+    void tryAdd(float val);
 };

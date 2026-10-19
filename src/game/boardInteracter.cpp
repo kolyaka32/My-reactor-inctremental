@@ -25,7 +25,9 @@ void BoardInteracter::setShowState(unsigned _state) {
 
 void BoardInteracter::update() {
     // Updating physic
-    board.update();
+    board.applyForces();
+    board.project();
+    board.advect();
     //board.applyChanges();
 }
 

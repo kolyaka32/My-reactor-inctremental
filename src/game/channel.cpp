@@ -6,6 +6,15 @@
 #include "channel.hpp"
 
 
-Channel::Channel() {
-    // None
+Channel::Channel() {}
+
+void Channel::reset() {
+    sp = 0.0;
+    wall = false;
+}
+
+void Channel::tryAdd(float _val) {
+    if (!wall) {
+        sp += _val;
+    }
 }

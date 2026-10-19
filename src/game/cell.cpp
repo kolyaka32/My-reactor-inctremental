@@ -16,11 +16,15 @@ Cell::Cell(float _pressure, float _temperature) {
     newEnergy = mass * temperature * heatCapacity;
 }
 
+static float a = 300.0;
+
 void Cell::reset() {
     // Setting parameters to global
     //temperature = environment.temperature;
     //mass = environment.mass;
-    temperature = 1.0;
+    //temperature = SDL_randf()*256+300;
+    temperature = a;
+    a += 10;
     mass = 1.0;
 
     // Setting temporary variables to basic

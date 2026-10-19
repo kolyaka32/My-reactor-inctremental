@@ -16,11 +16,16 @@ class Board {
     const int height;
     const int width;
     // Main array of cells
+    // Side cells not using
     Cell* cells;
     // Main array of chanels between cells
     Channel* verChanels;
-    Channel* upLeftChanels;
-    Channel* downLeftChanels;
+    Channel* upRightChannels;
+    Channel* downRightChannels;
+
+    // Calculations per unit
+    void projectUnit(Channel& bottom, Channel& upper, Channel& upRight, Channel& downLeft,
+        Channel& downRight, Channel& upperLeft);
 
  public:
     Board(unsigned width, unsigned height) noexcept;
@@ -34,6 +39,7 @@ class Board {
     int getHeight() const;
     bool isLegimate(SDL_Point pos) const;
     const Cell& operator[](SDL_Point point) const;
+
     // Calculations
     void applyForces();
     void project();
