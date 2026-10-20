@@ -19,7 +19,7 @@ class Board {
     // Side cells not using
     Cell* cells;
     // Main array of chanels between cells
-    Channel* upChanels;  // End on extra line
+    Channel* upChannels;  // End on extra line
     Channel* upLeftChannels;  // End on extra line
     Channel* downLeftChannels;  // Starting on extra upper line
 

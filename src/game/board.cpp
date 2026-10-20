@@ -11,7 +11,7 @@ Board::Board(unsigned _width, unsigned _height) noexcept
 width(_width) {
     // Allocating arrays
     cells = new Cell[height*width];
-    upChanels = new Channel[(height+1)*width];
+    upChannels = new Channel[(height+1)*width];
     upLeftChannels = new Channel[(height+1)*(width+1)];
     downLeftChannels = new Channel[(height+1)*(width+1)];
 
@@ -20,7 +20,7 @@ width(_width) {
 
 Board::~Board() noexcept {
     delete[] cells;
-    delete[] upChanels;
+    delete[] upChannels;
     delete[] upLeftChannels;
     delete[] downLeftChannels;
 }
@@ -28,19 +28,31 @@ Board::~Board() noexcept {
 void Board::reset() {
     for (int i=0; i < height*width; ++i) {
         cells[i].reset();
-        upChanels[i].reset();
+    }
+    for (int i=0; i < (height+1)*width; ++i) {
+        upChannels[i].reset();
+    }
+    for (int i=0; i < (height+1)*(width+1); ++i) {
         upLeftChannels[i].reset();
         downLeftChannels[i].reset();
     }
+
     // Placing vertical borders
-    for (int x=0; x < (height+1)*width; ++x) {
-        upChanels[x].wall = true;
+    for (int x=0; x < width; ++x) {
+        upChannels[x].wall = true;
+        upChannels[height*width+x].wall = true;
     }
-    for (int y=0; y < (height+1)*(width+1); ++y) {
-        upLeftChannels[y].wall = true;
+    for (int x=1; x < width; x+=2) {
+        downLeftChannels[x].wall = true;
+        upLeftChannels[x+1].wall = true;
+        downLeftChannels[height*(width+1)+x].wall = true;
+        upLeftChannels[height*(width+1)+x].wall = true;
     }
-    for (int y=0; y < (height+1)*(width+1); ++y) {
-        downLeftChannels[y].wall = true;
+    for (int y=0; y < height+1; ++y) {
+        upLeftChannels[y*(width+1)].wall = true;
+        upLeftChannels[y*(width+1)+width].wall = true;
+        downLeftChannels[y*(width+1)].wall = true;
+        downLeftChannels[y*(width+1)+width].wall = true;
     }
 }
 
@@ -96,8 +108,8 @@ void Board::project() {
     for (int y=0; y < height; ++y) {
         for (int x=0; x < width; x+=2) {
             projectUnit(
-                upChanels[y*width+x],
-                upChanels[(y+1)*width+x],
+                upChannels[y*width+x],
+                upChannels[(y+1)*width+x],
                 upLeftChannels[y*width+x],
                 upLeftChannels[(y-1)*width+x-1],
                 downLeftChannels[y*width+x],
@@ -109,8 +121,8 @@ void Board::project() {
     for (int y=0; y < height; ++y) {
         for (int x=1; x < width; x+=2) {
             projectUnit(
-                upChanels[y*width+x],
-                upChanels[(y+1)*width+x],
+                upChannels[y*width+x],
+                upChannels[(y+1)*width+x],
                 upLeftChannels[y*width+x],
                 upLeftChannels[y*width+x-1],
                 downLeftChannels[y*width+x],
@@ -164,7 +176,7 @@ void Board::blitBlockNormal(const Window& _window, SDL_FRect _rect, int _offset)
     for (int x=_offset; x < width; x+=2) {
         _rect.y = startY;
         for (int y=0; y < height; ++y) {
-            blitUnit(_window, _rect, cells[y*width+x].getNormalColor(), upChanels[y*width+x].wall,
+            blitUnit(_window, _rect, cells[y*width+x].getNormalColor(), upChannels[y*width+x].wall,
                 upLeftChannels[y*(width+1)+x].wall, downLeftChannels[(y+1)*(width+1)+x].wall);
             _rect.y += _rect.h;
         }
@@ -177,7 +189,7 @@ void Board::blitBlockThermal(const Window& _window, SDL_FRect _rect, int _offset
     for (int x=_offset; x < width; x+=2) {
         _rect.y = startY;
         for (int y=0; y < height; ++y) {
-            blitUnit(_window, _rect, cells[y*width+x].getThermalColor(), upChanels[y*width+x].wall,
+            blitUnit(_window, _rect, cells[y*width+x].getThermalColor(), upChannels[y*width+x].wall,
                 upLeftChannels[y*(width+1)+x].wall, downLeftChannels[(y+1)*(width+1)+x].wall);
             _rect.y += _rect.h;
         }
@@ -190,7 +202,7 @@ void Board::blitBlockPressure(const Window& _window, SDL_FRect _rect, int _offse
     for (int x=_offset; x < width; x+=2) {
         _rect.y = startY;
         for (int y=0; y < height; ++y) {
-            blitUnit(_window, _rect, cells[y*width+x].getPressureColor(), upChanels[y*width+x].wall,
+            blitUnit(_window, _rect, cells[y*width+x].getPressureColor(), upChannels[y*width+x].wall,
                 upLeftChannels[y*(width+1)+x].wall, downLeftChannels[(y+1)*(width+1)+x].wall);
             _rect.y += _rect.h;
         }
@@ -203,7 +215,7 @@ void Board::blitBlockRandom(const Window& _window, SDL_FRect _rect, int _offset)
     for (int x=_offset; x < width; x+=2) {
         _rect.y = startY;
         for (int y=0; y < height; ++y) {
-            blitUnit(_window, _rect, cells[y*width+x].getRandomColor(), upChanels[y*width+x].wall,
+            blitUnit(_window, _rect, cells[y*width+x].getRandomColor(), upChannels[y*width+x].wall,
                 upLeftChannels[y*(width+1)+x].wall, downLeftChannels[(y+1)*(width+1)+x].wall);
             _rect.y += _rect.h;
         }
@@ -255,14 +267,14 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
     // Down border
     _oddRect.x = startOddX;
     for (int x=0; x < width; x+=2) {
-        if (upChanels[width*height+x].wall) {
+        if (upChannels[width*height+x].wall) {
             blitDown(_window, _oddRect);
         }
         _oddRect.x += _oddRect.w * 1.5;
     }
     _evenRect.x = startEvenX;
     for (int x=1; x < width; x+=2) {
-        if (upChanels[width*height+x].wall) {
+        if (upChannels[width*height+x].wall) {
             blitDown(_window, _evenRect);
         }
         _evenRect.x += _evenRect.w * 1.5;
