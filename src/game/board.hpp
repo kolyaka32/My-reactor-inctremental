@@ -19,16 +19,18 @@ class Board {
     // Side cells not using
     Cell* cells;
     // Main array of chanels between cells
-    Channel* downChanels;
-    Channel* upRightChannels;
-    Channel* downRightChannels;
+    Channel* upChanels;  // End on extra line
+    Channel* upLeftChannels;  // End on extra line
+    Channel* downLeftChannels;  // Starting on extra upper line
 
     // Calculations per unit
-    void projectUnit(Channel& bottom, Channel& upper, Channel& upRight, Channel& downLeft,
-        Channel& downRight, Channel& upperLeft);
+    void projectUnit(Channel& upper, Channel& bottom, Channel& upperLeft, Channel& downRight,
+        Channel& downLeft, Channel& upRight);
     void blitUnit(const Window& window, SDL_FRect rect, SDL_FColor color,
-        bool down, bool upRight, bool downRight) const;
-    //void blitWalls(const Window& window, SDL_FRect rect, bool down, bool upRight, bool downRight) const;
+        bool upWall, bool upLeftWall, bool downLeftWall) const;
+    void blitDown(const Window& window, SDL_FRect rect) const;
+    void blitUpperRight(const Window& window, SDL_FRect rect) const;
+    void blitDownRight(const Window& window, SDL_FRect rect) const;
 
  public:
     Board(unsigned width, unsigned height) noexcept;
@@ -53,4 +55,5 @@ class Board {
     void blitBlockThermal(const Window& window, SDL_FRect rect, int offset) const;
     void blitBlockPressure(const Window& window, SDL_FRect rect, int offset) const;
     void blitBlockRandom(const Window& window, SDL_FRect rect, int offset) const;
+    void blitLines(const Window& window, SDL_FRect oddRect, SDL_FRect evenRect) const;
 };
