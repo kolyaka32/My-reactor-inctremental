@@ -50,6 +50,9 @@ class Board {
     void project();
     void advect();
 
+    // Test
+    void checkNext();
+
     // Draw
     void blitBlockNormal(const Window& window, SDL_FRect rect, int offset) const;
     void blitBlockThermal(const Window& window, SDL_FRect rect, int offset) const;

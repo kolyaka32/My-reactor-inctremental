@@ -27,16 +27,13 @@ private:
     // Draw rects in local positions
     SDL_FRect oddRect, evenRect;
 
-    // Draw different modes/parts
-    void blitBlock(SDL_FRect startRect, int offset) const;
-    void blitLines() const;
-
 public:
     BoardInteracter(const Window& window);
 
     // Interacting with scale and position
     void reset();
     void update();
+    void checkNext();
 
     // Interaction
     Grid grid;

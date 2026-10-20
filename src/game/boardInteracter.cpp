@@ -31,6 +31,10 @@ void BoardInteracter::update() {
     //board.applyChanges();
 }
 
+void BoardInteracter::checkNext() {
+    board.checkNext();
+}
+
 void BoardInteracter::blit() const {
     // ! Should get borders to less drowing
     window.setDrawColor(BLACK);

@@ -81,6 +81,7 @@ bool ControlMenu::press(SDL_Keycode _key) {
     if (_key == SDLK_R) {
         // Check, if try rotate part
         // ! interacter.holdingCell.rotate();
+        interacter.checkNext();
         return true;
     }
     if (buildSwitchBox.press(_key)) {
