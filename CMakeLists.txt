@@ -10,8 +10,8 @@ project(YARCHE)
 # Special for windows
 if (WIN32)
     # Hidding console
-    add_compile_options(-mwindows)
-    message("> Removing console")
+    add_link_options(-mwindows)
+    message("> Hidding console")
 
     # Setting to link standart libraries staticly
     add_link_options(-static-libgcc -static-libstdc++)
