@@ -26,6 +26,7 @@ class Board {
     // Calculations per unit
     void projectUnit(Channel& bottom, Channel& upper, Channel& upRight, Channel& downLeft,
         Channel& downRight, Channel& upperLeft);
+    void blitUnit(const Window& window, SDL_FRect rect, SDL_FColor color) const;
 
  public:
     Board(unsigned width, unsigned height) noexcept;
@@ -44,4 +45,11 @@ class Board {
     void applyForces();
     void project();
     void advect();  // Actual fluid transfer
+
+    // Draw
+    void blitBlockNormal(const Window& window, SDL_FRect rect, int offset) const;
+    void blitBlockThermal(const Window& window, SDL_FRect rect, int offset) const;
+    void blitBlockPressure(const Window& window, SDL_FRect rect, int offset) const;
+    void blitBlockRandom(const Window& window, SDL_FRect rect, int offset) const;
+    void blitLines() const;
 };

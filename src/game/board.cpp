@@ -32,6 +32,14 @@ void Board::reset() {
         upRightChannels[i].reset();
         downRightChannels[i].reset();
     }
+    // Placing vertical borders
+    for (int y=0; y < height; ++y) {
+        upRightChannels[y].wall = true;
+        downRightChannels[y].wall = true;
+    }
+    for (int x=0; x < width; ++x) {
+        verChanels[x].wall = true;
+    }
 }
 
 int Board::getWidth() const {
@@ -53,16 +61,19 @@ const Cell& Board::operator[](SDL_Point _pos) const {
 
 void Board::projectUnit(Channel& _c1, Channel& _c2, Channel& _c3, Channel& _c4,
     Channel& _c5, Channel& _c6) {
-    // Check deviation
-    float dev = (_c1.sp - _c2.sp + _c3.sp - _c4.sp + _c5.sp - _c6.sp)/6;
-
-    // Avaraging deviation spread between all channels
-    _c1.tryAdd(-dev);
-    _c2.tryAdd(dev);
-    _c3.tryAdd(-dev);
-    _c4.tryAdd(dev);
-    _c5.tryAdd(-dev);
-    _c6.tryAdd(dev);
+    // Check wall count
+    int count = _c1.wall + _c2.wall + _c3.wall + _c4.wall + _c5.wall + _c6.wall;
+    if (count) {
+        // Check deviation
+        float dev = (_c1.sp - _c2.sp + _c3.sp - _c4.sp + _c5.sp - _c6.sp)/count;
+        // Avaraging deviation spread between all channels
+        _c1.tryAdd(-dev);
+        _c3.tryAdd(-dev);
+        _c5.tryAdd(-dev);
+        _c2.tryAdd(dev);
+        _c4.tryAdd(dev);
+        _c6.tryAdd(dev);
+    }
 }
 
 void Board::applyForces() {
@@ -137,3 +148,68 @@ void Board::advect() {
         cells[i].applyChanges();
     }
 }*/
+
+void Board::blitUnit(const Window& _window, SDL_FRect _rect, SDL_FColor _color) const {
+    SDL_Vertex vertexes[] = {
+        {{_rect.x+_rect.w/4,   _rect.y},           _color},
+        {{_rect.x+_rect.w*3/4, _rect.y},           _color},
+        {{_rect.x,             _rect.y+_rect.h/2}, _color},
+        {{_rect.x+_rect.w,     _rect.y+_rect.h/2}, _color},
+        {{_rect.x+_rect.w/4,   _rect.y+_rect.h},   _color},
+        {{_rect.x+_rect.w*3/4, _rect.y+_rect.h},   _color},
+    };
+    int order[] = {0, 1, 2,    1, 2, 3,    2, 3, 4,    3, 4, 5};
+    _window.drawGeometry(vertexes, SDL_arraysize(vertexes), order, SDL_arraysize(order));
+}
+
+void Board::blitBlockNormal(const Window& _window, SDL_FRect _rect, int _offset) const {
+    float startY = _rect.y;
+    for (int x=_offset; x < width; x+=2) {
+        _rect.y = startY;
+        for (int y=0; y < height; ++y) {
+            blitUnit(_window, _rect, cells[y*width+x].getNormalColor());
+            _rect.y += _rect.h;
+        }
+        _rect.x += _rect.w * 1.5;
+    }
+}
+
+void Board::blitBlockThermal(const Window& _window, SDL_FRect _rect, int _offset) const {
+    float startY = _rect.y;
+    for (int x=_offset; x < width; x+=2) {
+        _rect.y = startY;
+        for (int y=0; y < height; ++y) {
+            blitUnit(_window, _rect, cells[y*width+x].getThermalColor());
+            _rect.y += _rect.h;
+        }
+        _rect.x += _rect.w * 1.5;
+    }
+}
+
+void Board::blitBlockPressure(const Window& _window, SDL_FRect _rect, int _offset) const {
+    float startY = _rect.y;
+    for (int x=_offset; x < width; x+=2) {
+        _rect.y = startY;
+        for (int y=0; y < height; ++y) {
+            blitUnit(_window, _rect, cells[y*width+x].getPressureColor());
+            _rect.y += _rect.h;
+        }
+        _rect.x += _rect.w * 1.5;
+    }
+}
+
+void Board::blitBlockRandom(const Window& _window, SDL_FRect _rect, int _offset) const {
+    float startY = _rect.y;
+    for (int x=_offset; x < width; x+=2) {
+        _rect.y = startY;
+        for (int y=0; y < height; ++y) {
+            blitUnit(_window, _rect, cells[y*width+x].getRandomColor());
+            _rect.y += _rect.h;
+        }
+        _rect.x += _rect.w * 1.5;
+    }
+}
+
+void Board::blitLines() const {
+    // !
+}

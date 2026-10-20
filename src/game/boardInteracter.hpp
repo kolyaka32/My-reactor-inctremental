@@ -28,7 +28,6 @@ private:
     SDL_FRect oddRect, evenRect;
 
     // Draw different modes/parts
-    void blitUnit(SDL_FRect rect, SDL_FColor color) const;
     void blitBlock(SDL_FRect startRect, int offset) const;
     void blitLines() const;
 
