@@ -19,14 +19,16 @@ class Board {
     // Side cells not using
     Cell* cells;
     // Main array of chanels between cells
-    Channel* verChanels;
+    Channel* downChanels;
     Channel* upRightChannels;
     Channel* downRightChannels;
 
     // Calculations per unit
     void projectUnit(Channel& bottom, Channel& upper, Channel& upRight, Channel& downLeft,
         Channel& downRight, Channel& upperLeft);
-    void blitUnit(const Window& window, SDL_FRect rect, SDL_FColor color) const;
+    void blitUnit(const Window& window, SDL_FRect rect, SDL_FColor color,
+        bool down, bool upRight, bool downRight) const;
+    //void blitWalls(const Window& window, SDL_FRect rect, bool down, bool upRight, bool downRight) const;
 
  public:
     Board(unsigned width, unsigned height) noexcept;
@@ -44,12 +46,11 @@ class Board {
     // Calculations
     void applyForces();
     void project();
-    void advect();  // Actual fluid transfer
+    void advect();
 
     // Draw
     void blitBlockNormal(const Window& window, SDL_FRect rect, int offset) const;
     void blitBlockThermal(const Window& window, SDL_FRect rect, int offset) const;
     void blitBlockPressure(const Window& window, SDL_FRect rect, int offset) const;
     void blitBlockRandom(const Window& window, SDL_FRect rect, int offset) const;
-    void blitLines() const;
 };

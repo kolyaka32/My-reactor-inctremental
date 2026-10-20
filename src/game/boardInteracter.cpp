@@ -33,6 +33,7 @@ void BoardInteracter::update() {
 
 void BoardInteracter::blit() const {
     // ! Should get borders to less drowing
+    window.setDrawColor(BLACK);
     switch (showState) {
     case ShowState::Thermal:
         board.blitBlockThermal(window, grid.absolute(oddRect), 0);
@@ -54,5 +55,4 @@ void BoardInteracter::blit() const {
         board.blitBlockNormal(window, grid.absolute(evenRect), 1);
         break;
     }
-    board.blitLines();
 }
