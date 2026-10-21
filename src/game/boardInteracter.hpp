@@ -33,7 +33,7 @@ public:
     // Interacting with scale and position
     void reset();
     void setShowState(unsigned state);
-    SDL_FPoint getPosition(const Mouse mouse) const;
+    SDL_Point getPosition(const Mouse mouse) const;
     bool isLegimate(SDL_Point pos) const;
     float getTemperature(SDL_Point pos) const;
     float getPressure(SDL_Point pos) const;

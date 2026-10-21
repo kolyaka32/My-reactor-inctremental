@@ -109,10 +109,10 @@ void Board::project() {
             projectUnit(cells[y*width+x],
                 upChannels[y*width+x],
                 upChannels[(y+1)*width+x],
-                upLeftChannels[y*width+x],
-                upLeftChannels[y*width+x+1],
-                downLeftChannels[y*width+x],
-                downLeftChannels[(y-1)*width+x+1]
+                upLeftChannels[y*(width+1)+x],
+                upLeftChannels[y*(width+1)+x+1],
+                downLeftChannels[(y+1)*(width+1)+x],
+                downLeftChannels[y*(width+1)+x+1]
             );
         }
     }
@@ -122,10 +122,10 @@ void Board::project() {
             projectUnit(cells[y*width+x],
                 upChannels[y*width+x],
                 upChannels[(y+1)*width+x],
-                upLeftChannels[y*width+x],
-                upLeftChannels[(y+1)*width+x+1],
-                downLeftChannels[y*width+x],
-                downLeftChannels[y*width+x+1]
+                upLeftChannels[y*(width+1)+x],
+                upLeftChannels[(y+1)*(width+1)+x+1],
+                downLeftChannels[y*(width+1)+x],
+                downLeftChannels[y*(width+1)+x+1]
             );
         }
     }

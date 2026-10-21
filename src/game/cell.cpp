@@ -23,7 +23,7 @@ void Cell::reset() {
     //temperature = SDL_randf()*256+300;
     static float a = 0.0;
     temperature = a;
-    a += 10;
+    a += 5.0;
     pressure = 0.0;
     //mass = 1.0;
 

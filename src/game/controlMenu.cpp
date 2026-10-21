@@ -13,7 +13,7 @@ panelBackplate(_window, _panelW/2, 0.5, _panelW, 1.0, 2.0, GREY, BLACK),
 modeText(_window, {"Show mode:", "Режим отображения:"}, {_panelW/2, 0.15, .frame=1}),
 modeSwitchBox(_window, {_panelW/2, 0.185, .textColor = BLACK, .backColor = WHITE}, 0.14,
     {{"Elements", "Элементы"}, {"Thermal", "Температурный"}, {"Pressure", "Давление"}, {"Random", "Случайные"}}),
-pickedElement(_window, {"Element: %f %f %f", "Элемент: %f %f %f"},
+pickedElement(_window, {"Element: %d %d", "Элемент: %d %d"},
     {_panelW/4, 0.3, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
 pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
     {_panelW/4, 0.33, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
@@ -102,8 +102,8 @@ void ControlMenu::update(const Mouse _mouse) {
     }
 
     // Finding connected cell
-    SDL_FPoint pos = interacter.getPosition(_mouse);
-    pickedElement.setValues(pos.x, pos.y, -pos.x-pos.y);
+    SDL_Point pos = interacter.getPosition(_mouse);
+    pickedElement.setValues(pos.x, pos.y);
 
     // Check, if building
     /*if (buildSwitchBox.getValue() != 0) {
@@ -111,7 +111,7 @@ void ControlMenu::update(const Mouse _mouse) {
         holdingCellRect.y = _mouse.getY() - holdingCellRect.h/2;
     }*/
 
-    /*if (interacter.isLegimate(pos)) {
+    if (interacter.isLegimate(pos)) {
         // Check pressing on field
         switch (mousePress) {
         case SDL_BUTTON_LMASK:
@@ -143,7 +143,7 @@ void ControlMenu::update(const Mouse _mouse) {
         pickedPressure.setValues(0.0f);
         pickedTemperature.setValues(0.0f);
         pickedSpeed.setValues(0.0f, 0.0f, 0.0f);
-    }*/
+    }
 }
 
 void ControlMenu::blit() const {
