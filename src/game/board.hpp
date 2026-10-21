@@ -24,8 +24,10 @@ class Board {
     Channel* downLeftChannels;  // Starting on extra upper line
 
     // Calculations per unit
-    void projectUnit(Channel& upper, Channel& bottom, Channel& upperLeft, Channel& downRight,
-        Channel& downLeft, Channel& upRight);
+    void projectUnit(Cell& cell, Channel& upper, Channel& bottom, Channel& upperLeft,
+        Channel& downRight, Channel& downLeft, Channel& upRight);
+
+    // Additional draw
     void blitUnit(const Window& window, SDL_FRect rect, SDL_FColor color,
         bool upWall, bool upLeftWall, bool downLeftWall) const;
     void blitDown(const Window& window, SDL_FRect rect) const;
@@ -40,18 +42,15 @@ class Board {
 
     // Interaction
     void reset();
-    int getWidth() const;
-    int getHeight() const;
     bool isLegimate(SDL_Point pos) const;
-    const Cell& operator[](SDL_Point point) const;
+    float getTemperature(SDL_Point pos) const;
+    float getPressure(SDL_Point pos) const;
+    float getSpeed(SDL_Point pos) const;
 
     // Calculations
     void applyForces();
     void project();
     void advect();
-
-    // Test
-    void checkNext();
 
     // Draw
     void blitBlockNormal(const Window& window, SDL_FRect rect, int offset) const;

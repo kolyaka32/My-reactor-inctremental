@@ -32,16 +32,21 @@ public:
 
     // Interacting with scale and position
     void reset();
+    void setShowState(unsigned state);
+    SDL_Point getPosition(const Mouse mouse) const;
+    bool isLegimate(SDL_Point pos) const;
+    float getTemperature(SDL_Point pos) const;
+    float getPressure(SDL_Point pos) const;
+    float getSpeed(SDL_Point pos) const;
+
+    // Cycle
     void update();
-    void checkNext();
+    void blit() const;
 
     // Interaction
     Grid grid;
+
     // ! change to own class
     Cell holdingCell;
     SDL_FRect holdingCellRect;
-
-    void setShowState(unsigned state);
-
-    void blit() const;
 };

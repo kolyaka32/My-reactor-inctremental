@@ -8,13 +8,13 @@
 
 Cell::Cell() {}
 
-Cell::Cell(float _pressure, float _temperature) {
+/*Cell::Cell(float _pressure, float _temperature) {
     temperature = _temperature;
     mass = _pressure * volume / _temperature;
     // Setting temporary variables to basic
     newMass = mass;
     newEnergy = mass * temperature * heatCapacity;
-}
+}*/
 
 static float a = 300.0;
 
@@ -25,14 +25,15 @@ void Cell::reset() {
     //temperature = SDL_randf()*256+300;
     temperature = a;
     a += 10;
-    mass = 1.0;
+    pressure = 0.0;
+    //mass = 1.0;
 
     // Setting temporary variables to basic
-    newMass = mass;
-    newEnergy = mass * temperature * heatCapacity;
+    //newMass = mass;
+    //newEnergy = mass * temperature * heatCapacity;
 }
 
-float Cell::getPressure() const {
+/*float Cell::getPressure() const {
     return mass * temperature / volume;
 }
 
@@ -127,7 +128,7 @@ void Cell::cool(Cell& _outGase, float _power) {
 void Cell::applyChanges() {
     mass = newMass;
     temperature = newEnergy / mass / heatCapacity;
-}
+}*/
 
 SDL_FColor Cell::getNormalColor() const {
     // Normal color map
@@ -149,14 +150,20 @@ SDL_FColor Cell::getThermalColor() const {
 }
 
 SDL_FColor Cell::getPressureColor() const {
-    float pressure = getPressure();
-
-    // Doesn't check less then 0
+    //float pressure = getPressure();
     constexpr float drawPressureKoef = 1.0;
-    if (pressure > 255/drawPressureKoef) {
-        return {1.0, 1.0, 1.0, 1.0};
+    if (pressure > 0.0) {
+        // If greater - red
+        if (pressure > 1.0/drawPressureKoef) {
+            return {1.0, 0.0, 0.0, 1.0};
+        }
+        return {pressure*drawPressureKoef, 0.0, 0.0, 1.0};
     }
-    return {1.0, 1.0, pressure*drawPressureKoef, 1.0};
+    // If less - blue
+    if (pressure < 1.0/drawPressureKoef) {
+        return {0.0, 0.0, 1.0, 1.0};
+    }
+    return {0.0, 0.0, pressure*drawPressureKoef, 1.0};
 }
 
 SDL_FColor Cell::getRandomColor() const {

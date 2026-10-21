@@ -61,6 +61,7 @@ namespace GUI {
      public:
         TextureTemplate(const Window& window, SDL_Texture* texture = nullptr);
         TextureTemplate(const Window& window, SDL_FRect rect, SDL_Texture* texture = nullptr);
+        TextureTemplate(const TextureTemplate& object) = delete;
         TextureTemplate(TextureTemplate&& object) noexcept;
         void move(float X, float Y) override;
         void blit() const override;

@@ -14,7 +14,7 @@ private:
     // Parameters of one cell of gase
     // Required 3 from 4 paramters: mass, presure, temperature, volume
     // Volume is constant and = 1
-    float mass;         // [kg]
+    /*float mass;         // [kg]
     float temperature;  // [K]
     // Inter-cycle variables for temporary storage
     float newMass;      // [kg]
@@ -25,20 +25,23 @@ private:
     static constexpr float pressureKoef = 0.01;  // [1]
     static constexpr float heatCapacity = 1.0;   // [J/kg/K]
 
-    float getMassFlow(const Cell& second, float power = 0.0) const;
+    float getMassFlow(const Cell& second, float power = 0.0) const;*/
 
 public:
     Cell();
-    Cell(float pressure, float temperature);
+    //Cell(float pressure, float temperature);
     void reset();
 
+    float temperature;  // [K]
+    float pressure;  // [Pa]
+
     // Getters
-    float getPressure() const;
+    /*float getPressure() const;
     float getMass() const;
-    float getTemperature() const;
+    float getTemperature() const;*/
 
     // Interactions
-    void reduceMass(float koefMass);
+    /*void reduceMass(float koefMass);
     void addMass(float deltaMass, const Cell srcGase);
     void addTemperature(float power);
 
@@ -48,7 +51,7 @@ public:
     void vent(Cell& outGase, float power);  // Take air from current cell to outlet
     void exchangeValved(Cell& outGase);  // Allow flow only to one direction
     void cool(Cell& outGase, float power);  // Cool tile by heating up out tile
-    void applyChanges();  // Apply accumulated per exchanges changes
+    void applyChanges();  // Apply accumulated per exchanges changes*/
 
     // Drawing
     SDL_FColor getNormalColor() const;

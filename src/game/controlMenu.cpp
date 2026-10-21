@@ -17,6 +17,8 @@ pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
     {_panelW/4, 0.3, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
 pickedTemperature(_window, {"Temperature: %4.1f", "Температура: %4.1f"},
     {_panelW/4, 0.33, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
+pickedSpeed(_window, {"Speed: %3.1f %3.1f %3.1f", "Скорость: %3.1f %3.1f %3.1f"},
+    {_panelW/4, 0.36, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
 buildText(_window, {"Build object:", "Объект постройки:"}, {_panelW/2, 0.5, .frame=1}),
 buildSwitchBox(_window, {_panelW/2, 0.535, .textColor = BLACK, .backColor = WHITE}, 0.14,
     {{"Not selected", "Не выбран"}, {"Demplish", "Снести"}, {"Wall", "Стена"}, {"Vent", "Вентилятор"},
@@ -27,6 +29,7 @@ void ControlMenu::reset() {
     mousePress = 0;
     pickedPressure.setValues(0.0f);
     pickedTemperature.setValues(0.0f);
+    pickedSpeed.setValues(0.0f, 0.0f, 0.0f);
 }
 
 bool ControlMenu::click(const Mouse _mouse) {
@@ -81,7 +84,6 @@ bool ControlMenu::press(SDL_Keycode _key) {
     if (_key == SDLK_R) {
         // Check, if try rotate part
         // ! interacter.holdingCell.rotate();
-        interacter.checkNext();
         return true;
     }
     if (buildSwitchBox.press(_key)) {
@@ -91,66 +93,53 @@ bool ControlMenu::press(SDL_Keycode _key) {
 }
 
 void ControlMenu::update(const Mouse _mouse) {
-    // Moving
+    // Movement
     if (mousePress == SDL_BUTTON_MMASK) {
         interacter.grid.update(_mouse.getX(), _mouse.getY());
     }
 
     // Finding connected cell
-    /*const SDL_FRect rect = grid.absolute(cellRect);
-    SDL_Point position = {int((_mouse.getX()-rect.x)/rect.w + 1), int((_mouse.getY()-rect.y)/rect.h + 1)};
+    SDL_Point pos = interacter.getPosition(_mouse);
 
     // Check, if building
-    if (buildSwitchBox.getValue() != 0) {
+    /*if (buildSwitchBox.getValue() != 0) {
         holdingCellRect.x = _mouse.getX() - holdingCellRect.w/2;
         holdingCellRect.y = _mouse.getY() - holdingCellRect.h/2;
-    }
+    }*/
 
-    // Finding connected cell
-    const SDL_FRect rect = grid.absolute(cellRect);
-    SDL_Point position = {int((_mouse.getX()-rect.x)/rect.w + 1), int((_mouse.getY()-rect.y)/rect.h + 1)};
-
-    // Check, if in accessible area
-    if (position.x > 0 && position.x <= board.getWidth() &&
-        position.y > 0 && position.y <= board.getHeight()) {
+    if (interacter.isLegimate(pos)) {
         // Check pressing on field
         switch (mousePress) {
         case SDL_BUTTON_LMASK:
             // Check, if try to do build
-            if (buildSwitchBox.getValue()) {
-                // Check, if demolish cell
-                if (holdingCell.state == Cell::Buldozer) {
-                    board.resetCell(position);
-                } else {
-                    board.setCell(position, holdingCell);
-                }
-            } else {
-                board.applyMass(position, 0.1);
-            }
+            // !
+
             break;
 
         case SDL_BUTTON_RMASK:
-            board.applyTemperature(position, 1.0);
+            //interacter.applyTemperature(position, 1.0);
             break;
 
         case SDL_BUTTON_X1MASK:
-            board.reduceMass(position, 2);
+            //interacter.reduceMass(position, 2);
             break;
 
         case SDL_BUTTON_X2MASK:
-            board.applyTemperature(position, -1.0);
+            //interacter.applyTemperature(position, -1.0);
             break;
 
         default:
             break;
         }
         // Update showing parameter
-        pickedPressure.setValues(board.getPressure(position));
-        pickedTemperature.setValues(board.getTemperature(position));
+        pickedPressure.setValues(interacter.getPressure(pos));
+        pickedTemperature.setValues(interacter.getTemperature(pos));
+        pickedSpeed.setValues(interacter.getSpeed(pos), 0.0f, 0.0f);
     } else {
         pickedPressure.setValues(0.0f);
         pickedTemperature.setValues(0.0f);
-    }*/
+        pickedSpeed.setValues(0.0f, 0.0f, 0.0f);
+    }
 }
 
 void ControlMenu::blit() const {
@@ -160,6 +149,7 @@ void ControlMenu::blit() const {
     modeSwitchBox.blit();
     pickedPressure.blit();
     pickedTemperature.blit();
+    pickedSpeed.blit();
     buildText.blit();
     buildSwitchBox.blit();
     resetButton.blit();

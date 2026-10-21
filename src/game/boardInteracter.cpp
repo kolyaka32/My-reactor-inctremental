@@ -23,16 +23,34 @@ void BoardInteracter::setShowState(unsigned _state) {
     showState = (ShowState)_state;
 }
 
-void BoardInteracter::update() {
-    // Updating physic
-    /*board.applyForces();
-    board.project();
-    board.advect();*/
-    //board.applyChanges();
+SDL_Point BoardInteracter::getPosition(const Mouse _mouse) const {
+    SDL_FPoint local = grid.local(_mouse);
+    SDL_Point position = {int(local.x/oddRect.w/3), int(-local.x/oddRect.h/3-local.y/oddRect.w/3)};
+    return position;
 }
 
-void BoardInteracter::checkNext() {
-    board.checkNext();
+bool BoardInteracter::isLegimate(SDL_Point _pos) const {
+    return board.isLegimate(_pos);
+}
+
+float BoardInteracter::getTemperature(SDL_Point _pos) const {
+    return board.getTemperature(_pos);
+}
+
+float BoardInteracter::getPressure(SDL_Point _pos) const {
+    return board.getPressure(_pos);
+}
+
+float BoardInteracter::getSpeed(SDL_Point _pos) const {
+    return board.getSpeed(_pos);
+}
+
+void BoardInteracter::update() {
+    // Updating physic
+    board.applyForces();
+    board.project();
+    board.advect();
+    //board.applyChanges();
 }
 
 void BoardInteracter::blit() const {

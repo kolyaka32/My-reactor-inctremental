@@ -56,45 +56,46 @@ void Board::reset() {
     }
 }
 
-int Board::getWidth() const {
-    return width;
-}
-
-int Board::getHeight() const {
-    return height;
-}
-
 bool Board::isLegimate(SDL_Point _pos) const {
     return _pos.x > 0 && _pos.x <= width &&
-        _pos.y > 0 && _pos.y <= height;  // ! Check end positions
+        _pos.y > 0 && _pos.y <= height;
 }
 
-const Cell& Board::operator[](SDL_Point _pos) const {
-    return cells[_pos.y*width+_pos.x];
+float Board::getTemperature(SDL_Point _pos) const {
+    return cells[_pos.y*width+_pos.x].temperature;
 }
 
-static int counter = 0;
+float Board::getPressure(SDL_Point _pos) const {
+    return cells[_pos.y*width+_pos.x].pressure;
+}
 
-void Board::checkNext() {
+float Board::getSpeed(SDL_Point _pos) const {
+    return upChannels[_pos.y*(width+1)+_pos.x].sp;
+}
+
+/*void Board::checkNext() {
+    static int counter = 0;
     downLeftChannels[counter].wall = true;
     downLeftChannels[counter+1].wall = false;
     counter = (counter+1) % ((width+1)*(height+1));
-}
+}*/
 
-void Board::projectUnit(Channel& _c1, Channel& _c2, Channel& _c3, Channel& _c4,
-    Channel& _c5, Channel& _c6) {
+void Board::projectUnit(Cell& _cell, Channel& _c1, Channel& _c2,
+    Channel& _c3, Channel& _c4, Channel& _c5, Channel& _c6) {
     // Check wall count
     int count = _c1.wall + _c2.wall + _c3.wall + _c4.wall + _c5.wall + _c6.wall;
     if (count) {
-        // Check deviation
-        float dev = (_c1.sp - _c2.sp + _c3.sp - _c4.sp + _c5.sp - _c6.sp)/count;
-        // Avaraging deviation spread between all channels
-        _c1.tryAdd(-dev);
-        _c3.tryAdd(-dev);
-        _c5.tryAdd(-dev);
-        _c2.tryAdd(dev);
-        _c4.tryAdd(dev);
-        _c6.tryAdd(dev);
+        // Calculate divergation
+        float div = (_c1.sp - _c2.sp + _c3.sp - _c4.sp + _c5.sp - _c6.sp)/count;
+        // Avaraging divergation spread between all channels
+        _c1.tryAdd(-div);
+        _c3.tryAdd(-div);
+        _c5.tryAdd(-div);
+        _c2.tryAdd(div);
+        _c4.tryAdd(div);
+        _c6.tryAdd(div);
+        // Update pressure
+        _cell.pressure += div/count;
     }
 }
 
@@ -107,26 +108,26 @@ void Board::project() {
     // Odd cells
     for (int y=0; y < height; ++y) {
         for (int x=0; x < width; x+=2) {
-            projectUnit(
+            projectUnit(cells[y*width+x],
                 upChannels[y*width+x],
                 upChannels[(y+1)*width+x],
                 upLeftChannels[y*width+x],
-                upLeftChannels[(y-1)*width+x-1],
+                upLeftChannels[y*width+x+1],
                 downLeftChannels[y*width+x],
-                downLeftChannels[y*width+x-1]
+                downLeftChannels[(y-1)*width+x+1]
             );
         }
     }
     // Even cells
     for (int y=0; y < height; ++y) {
         for (int x=1; x < width; x+=2) {
-            projectUnit(
+            projectUnit(cells[y*width+x],
                 upChannels[y*width+x],
                 upChannels[(y+1)*width+x],
                 upLeftChannels[y*width+x],
-                upLeftChannels[y*width+x-1],
+                upLeftChannels[(y+1)*width+x+1],
                 downLeftChannels[y*width+x],
-                downLeftChannels[(y+1)*width+x-1]
+                downLeftChannels[y*width+x+1]
             );
         }
     }
@@ -135,6 +136,27 @@ void Board::project() {
 void Board::advect() {
     // Transfer of fluid (save momentum)
     // !
+    const int N=width;
+
+    /*float dt0 = 0.3*N;
+    for (int i=1; i<=N; i++) {
+        for (int j=1; j<=N; j++) {
+            float x = i - dt0 * u[IX(i,j)];
+            float y = j - dt0 * v[IX(i,j)];
+            if (x<0.5) x=0.5;
+            if (x>N+0.5) x=N+ 0.5;
+            if (y<0.5) y=0.5;
+            if (y>N+0.5) y=N+ 0.5;
+            int i0=(int)x;
+            int j0=(int)y;
+            float s1 = x-i0;
+            float s0 = 1-s1;
+            float t1 = y-j0;
+            float t0 = 1-t1;
+            d[IX(i,j)] = s0*(t0*d0[IX(i0,j0)]+t1*d0[IX(i0,j0+1)])+
+                s1*(t0*d0[IX(i0+1,j0)]+t1*d0[IX(i0+1,j0+1)]);
+        }
+    }*/
 }
 
 void Board::blitUnit(const Window& _window, SDL_FRect _rect, SDL_FColor _color, bool _up, bool _upLeft, bool _downLeft) const {
