@@ -13,12 +13,14 @@ panelBackplate(_window, _panelW/2, 0.5, _panelW, 1.0, 2.0, GREY, BLACK),
 modeText(_window, {"Show mode:", "Режим отображения:"}, {_panelW/2, 0.15, .frame=1}),
 modeSwitchBox(_window, {_panelW/2, 0.185, .textColor = BLACK, .backColor = WHITE}, 0.14,
     {{"Elements", "Элементы"}, {"Thermal", "Температурный"}, {"Pressure", "Давление"}, {"Random", "Случайные"}}),
-pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
+pickedElement(_window, {"Element: %f %f %f", "Элемент: %f %f %f"},
     {_panelW/4, 0.3, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
-pickedTemperature(_window, {"Temperature: %4.1f", "Температура: %4.1f"},
+pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
     {_panelW/4, 0.33, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
-pickedSpeed(_window, {"Speed: %3.1f %3.1f %3.1f", "Скорость: %3.1f %3.1f %3.1f"},
+pickedTemperature(_window, {"Temperature: %4.1f", "Температура: %4.1f"},
     {_panelW/4, 0.36, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
+pickedSpeed(_window, {"Speed: %3.1f %3.1f %3.1f", "Скорость: %3.1f %3.1f %3.1f"},
+    {_panelW/4, 0.39, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
 buildText(_window, {"Build object:", "Объект постройки:"}, {_panelW/2, 0.5, .frame=1}),
 buildSwitchBox(_window, {_panelW/2, 0.535, .textColor = BLACK, .backColor = WHITE}, 0.14,
     {{"Not selected", "Не выбран"}, {"Demplish", "Снести"}, {"Wall", "Стена"}, {"Vent", "Вентилятор"},
@@ -27,6 +29,7 @@ resetButton(_window, {"Reset", "Сброс"}, {_panelW/2, 0.8, .frame=1}) {}
 
 void ControlMenu::reset() {
     mousePress = 0;
+    pickedElement.setValues(0, 0, 0);
     pickedPressure.setValues(0.0f);
     pickedTemperature.setValues(0.0f);
     pickedSpeed.setValues(0.0f, 0.0f, 0.0f);
@@ -57,7 +60,7 @@ bool ControlMenu::click(const Mouse _mouse) {
     mousePress = _mouse.getState();
 
     // Start camera movement
-    if (mousePress == SDL_BUTTON_MMASK) {
+    if (_mouse.getState() == SDL_BUTTON_MMASK) {
         interacter.grid.click(_mouse.getX(), _mouse.getY());
         return true;
     }
@@ -99,7 +102,8 @@ void ControlMenu::update(const Mouse _mouse) {
     }
 
     // Finding connected cell
-    SDL_Point pos = interacter.getPosition(_mouse);
+    SDL_FPoint pos = interacter.getPosition(_mouse);
+    pickedElement.setValues(pos.x, pos.y, -pos.x-pos.y);
 
     // Check, if building
     /*if (buildSwitchBox.getValue() != 0) {
@@ -107,7 +111,7 @@ void ControlMenu::update(const Mouse _mouse) {
         holdingCellRect.y = _mouse.getY() - holdingCellRect.h/2;
     }*/
 
-    if (interacter.isLegimate(pos)) {
+    /*if (interacter.isLegimate(pos)) {
         // Check pressing on field
         switch (mousePress) {
         case SDL_BUTTON_LMASK:
@@ -139,7 +143,7 @@ void ControlMenu::update(const Mouse _mouse) {
         pickedPressure.setValues(0.0f);
         pickedTemperature.setValues(0.0f);
         pickedSpeed.setValues(0.0f, 0.0f, 0.0f);
-    }
+    }*/
 }
 
 void ControlMenu::blit() const {
@@ -147,6 +151,7 @@ void ControlMenu::blit() const {
     panelBackplate.blit();
     modeText.blit();
     modeSwitchBox.blit();
+    pickedElement.blit();
     pickedPressure.blit();
     pickedTemperature.blit();
     pickedSpeed.blit();

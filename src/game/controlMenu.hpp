@@ -22,6 +22,7 @@ class ControlMenu : public GUI::Template {
     GUI::RectBackplate panelBackplate;
     GUI::StaticText modeText;
     GUI::SwitchBox modeSwitchBox;
+    GUI::DynamicText pickedElement;
     GUI::DynamicText pickedPressure;
     GUI::DynamicText pickedTemperature;
     GUI::DynamicText pickedSpeed;

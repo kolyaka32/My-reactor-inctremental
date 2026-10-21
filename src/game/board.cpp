@@ -14,8 +14,6 @@ width(_width) {
     upChannels = new Channel[(height+1)*width];
     upLeftChannels = new Channel[(height+1)*(width+1)];
     downLeftChannels = new Channel[(height+1)*(width+1)];
-
-    reset();
 }
 
 Board::~Board() noexcept {
@@ -57,8 +55,8 @@ void Board::reset() {
 }
 
 bool Board::isLegimate(SDL_Point _pos) const {
-    return _pos.x > 0 && _pos.x <= width &&
-        _pos.y > 0 && _pos.y <= height;
+    return _pos.x >= 0 && _pos.x < width &&
+        _pos.y >= 0 && _pos.y < height;
 }
 
 float Board::getTemperature(SDL_Point _pos) const {
@@ -135,26 +133,23 @@ void Board::project() {
 
 void Board::advect() {
     // Transfer of fluid (save momentum)
-    // !
-    const int N=width;
-
-    /*float dt0 = 0.3*N;
-    for (int i=1; i<=N; i++) {
-        for (int j=1; j<=N; j++) {
-            float x = i - dt0 * u[IX(i,j)];
-            float y = j - dt0 * v[IX(i,j)];
+    /*float dt0 = 0.3*width;
+    for (int i=1; i<=width; i++) {
+        for (int j=1; j<=width; j++) {
+            float x = i - dt0 * u[j*width+i];
+            float y = j - dt0 * v[j*width+i];
             if (x<0.5) x=0.5;
-            if (x>N+0.5) x=N+ 0.5;
+            if (x>width+0.5) x=width+ 0.5;
             if (y<0.5) y=0.5;
-            if (y>N+0.5) y=N+ 0.5;
+            if (y>width+0.5) y=width+ 0.5;
             int i0=(int)x;
             int j0=(int)y;
             float s1 = x-i0;
             float s0 = 1-s1;
             float t1 = y-j0;
             float t0 = 1-t1;
-            d[IX(i,j)] = s0*(t0*d0[IX(i0,j0)]+t1*d0[IX(i0,j0+1)])+
-                s1*(t0*d0[IX(i0+1,j0)]+t1*d0[IX(i0+1,j0+1)]);
+            d[j0*width+i0] = s0*(t0*d0[j0*width+i0] + t1*d0[(j0+1)*width+i0]) +
+                s1*(t0*d0[j0*width+i0+1)] + t1*d0[(j0+1)*width+i0+1]);
         }
     }*/
 }
