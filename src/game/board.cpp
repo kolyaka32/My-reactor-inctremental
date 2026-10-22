@@ -54,21 +54,62 @@ void Board::reset() {
     }
 }
 
-bool Board::isLegimate(SDL_Point _pos) const {
-    return _pos.x >= 0 && _pos.x < width &&
-        _pos.y >= 0 && _pos.y < height;
+bool Board::isLegimate(ChannelPos _pos) const {
+    switch (_pos.type) {
+    case 0:  // Cell
+        return _pos.x >= 0 && _pos.x < width &&
+            _pos.y >= 0 && _pos.y < height;
+
+    case 1:  // Up channel
+        return _pos.x >= 0 && _pos.x < width &&
+            _pos.y >= 0 && _pos.y < height+1;
+
+    case 2:  // Left up channel
+        return _pos.x >= 0 && _pos.x < width &&
+            _pos.y >= 0 && _pos.y < height;
+
+    default:  // Left down channel
+        return _pos.x >= 0 && _pos.x < width &&
+            _pos.y >= 0 && _pos.y < height;
+    }
 }
 
-CellInfo Board::getCellInfo(SDL_Point _pos) const {
-    return {cells[_pos.y*width+_pos.x].temperature,
-        cells[_pos.y*width+_pos.x].pressure,
-        upChannels[_pos.y*(width+1)+_pos.x].sp,
-        upLeftChannels[_pos.y*(width+1)+_pos.x].sp,
-        downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].sp};
+CellInfo Board::getInfo(ChannelPos _pos) const {
+    /*switch (_pos.type) {
+    case 0:  // Cell
+        return {cells[_pos.y*width+_pos.x].temperature,
+            cells[_pos.y*width+_pos.x].pressure};
+
+    case 1:  // Up channel
+        return {.speed = upChannels[_pos.y*width+_pos.x].sp};
+
+    case 2:  // Left up channel
+        return {.speed = upLeftChannels[_pos.y*(width+1)+_pos.x].sp};
+
+    default:  // Left down channel
+        return {.speed = downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].sp};
+    }*/
 }
 
-void Board::applyMovement(SDL_Point _pos, float _val) {
-    upChannels[_pos.y*width+_pos.x].sp += _val;
+void Board::applyMovement(ChannelPos _pos, float _val) {
+    /*switch (_pos.type) {
+    case 0:  // Cell
+        // Nothing
+        cells[_pos.y*width+_pos.x].temperature += _val;
+        return;
+
+    case 1:  // Up channel
+        upChannels[_pos.y*width+_pos.x].sp += _val;
+        return;
+
+    case 2:  // Left up channel
+        upLeftChannels[_pos.y*(width+1)+_pos.x].sp += _val;
+        return;
+
+    default:  // Left down channel
+        downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].sp += _val;
+        return;
+    }*/
 }
 
 /*void Board::checkNext() {

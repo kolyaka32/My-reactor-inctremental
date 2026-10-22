@@ -17,15 +17,16 @@ class ControlMenu : public GUI::Template {
 
     // State for pressing mouse from SDL_MouseButtonFlags
     int mousePress;
+    // Current selected object
+    ChannelPos pos;
 
     // Elements
     GUI::RectBackplate panelBackplate;
     GUI::StaticText modeText;
     GUI::SwitchBox modeSwitchBox;
     GUI::DynamicText pickedElement;
-    GUI::DynamicText pickedPressure;
-    GUI::DynamicText pickedTemperature;
-    GUI::DynamicText pickedSpeed;
+    GUI::DynamicText pickedPressure, pickedTemperature;
+    GUI::DynamicText pickedUpSpeed, pickedLeftUpSpeed, pickedLeftDownSpeed;
     GUI::StaticText buildText;
     GUI::SwitchBox buildSwitchBox;
     GUI::TextButton resetButton;

@@ -30,13 +30,13 @@ private:
 
 public:
     BoardInteracter(const Window& window);
-
     void reset();
+
     void setShowState(unsigned state);
-    SDL_Point getPosition(const Mouse mouse) const;
-    bool isLegimate(SDL_Point pos) const;
-    CellInfo getCellInfo(SDL_Point pos) const;
-    void applyMovement(SDL_Point pos, float val);
+    ChannelPos getPosition(const Mouse mouse) const;
+    bool isLegimate(ChannelPos pos) const;
+    CellInfo getInfo(ChannelPos pos) const;
+    void applyMovement(ChannelPos pos, float val);
 
     // Cycle
     void update();
@@ -45,7 +45,8 @@ public:
     // Interaction
     Grid grid;
 
-    // ! change to own class
+    // Current selected object
+    ChannelPos pos;
     Cell holdingCell;
     SDL_FRect holdingCellRect;
 };

@@ -11,11 +11,17 @@
 
 // Additional info about one cell for show
 struct CellInfo {
+    // For cell
     float temperature;
     float pressure;
-    float speedUp;
-    float speedLeftUp;
-    float speedLeftDown;
+    // For channel
+    float speed;
+};
+
+// Special position for channel
+struct ChannelPos {
+    int type;  // 0 for cell, 1 for up, 2 for leftUp and 3 for leftDown
+    float x, y;
 };
 
 // Main object
@@ -50,12 +56,12 @@ class Board {
     Board(const Board& board) = delete;
     Board(Board&& board) = delete;
     ~Board() noexcept;
-
-    // Interaction
     void reset();
-    bool isLegimate(SDL_Point pos) const;
-    CellInfo getCellInfo(SDL_Point pos) const;
-    void applyMovement(SDL_Point pos, float val);
+
+    // Interactions
+    bool isLegimate(ChannelPos pos) const;
+    CellInfo getInfo(ChannelPos pos) const;
+    void applyMovement(ChannelPos pos, float val);
 
     // Calculations
     void applyForces();

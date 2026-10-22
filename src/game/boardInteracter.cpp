@@ -23,32 +23,72 @@ void BoardInteracter::setShowState(unsigned _state) {
     showState = (ShowState)_state;
 }
 
-SDL_Point BoardInteracter::getPosition(const Mouse _mouse) const {
+ChannelPos BoardInteracter::getPosition(const Mouse _mouse) const {
     SDL_FPoint local = grid.local(_mouse);
     local.x -= oddRect.w/2;
     local.y -= oddRect.h/2;
 
-    float fractional_q = local.x*4/oddRect.w/3;
-    float fractional_r = local.y/oddRect.h - local.x*2/oddRect.w/3;
+    int x = SDL_roundf(local.x*4/oddRect.w/3);
+    int y = SDL_roundf(local.y/oddRect.h);
 
-    int q = SDL_roundf(fractional_q);
-    int r = SDL_roundf(fractional_r);
+    float frac_q = -local.x*2/oddRect.w/3 + local.y/oddRect.h;
+    float frac_r = local.x/oddRect.w + local.y/oddRect.h/2;
+    //float frac_s = -frac_q-frac_r;
 
-    if (q % 2 == 0) {
-        return {q, r+q/2};
+    int q = SDL_roundf(frac_q);
+    int r = SDL_roundf(frac_r);
+    //int s = SDL_roundf(frac_s);
+
+    if (y % 2 == 0) {
+        //
+        if (SDL_fabs(r - frac_r)) {
+            //
+        }
     }
-    return {q, r+(q-1)/2};
+
+    /*float q_diff = SDL_fabs(q - frac_q);
+    float r_diff = SDL_fabs(r - frac_r);
+    float s_diff = SDL_fabs(s - frac_s);
+
+    if (q_diff > r_diff and q_diff > s_diff) {
+        q = -r - s;
+    } else if (r_diff > s_diff) {
+        r = -q - s;
+    }*/
+
+    // Deciding type
+    int type = 0;
+    const float border = 0.4;
+    /*if (r % 2 == 0) {
+        if (SDL_fabs(q - frac_q) > border) {
+            type = 1;  // Vertical
+        } else if (false) {
+            type = 2;  // Left upper
+        } else if (false) {
+            type = 3;  // Left down
+        }
+    } else {
+        if (SDL_fabs(q - frac_q) < 0.5-border) {
+            type = 1;  // Vertical
+        } else if (false) {
+            type = 2;  // Left upper
+        } else if (false) {
+            type = 3;  // Left down
+        }
+        //return {type, x, SDL_fabs(q - frac_q)};
+    }*/
+    return {type, x, r};
 }
 
-bool BoardInteracter::isLegimate(SDL_Point _pos) const {
+bool BoardInteracter::isLegimate(ChannelPos _pos) const {
     return board.isLegimate(_pos);
 }
 
-CellInfo BoardInteracter::getCellInfo(SDL_Point _pos) const {
-    return board.getCellInfo(_pos);
+CellInfo BoardInteracter::getInfo(ChannelPos _pos) const {
+    return board.getInfo(_pos);
 }
 
-void BoardInteracter::applyMovement(SDL_Point _pos, float _val) {
+void BoardInteracter::applyMovement(ChannelPos _pos, float _val) {
     board.applyMovement(_pos, _val);
 }
 
