@@ -9,6 +9,15 @@
 #include "channel.hpp"
 
 
+// Additional info about one cell for show
+struct CellInfo {
+    float temperature;
+    float pressure;
+    float speedUp;
+    float speedLeftUp;
+    float speedLeftDown;
+};
+
 // Main object
 class Board {
  private:
@@ -28,6 +37,8 @@ class Board {
         Channel& downRight, Channel& downLeft, Channel& upRight);
 
     // Additional draw
+    SDL_FColor getSpeedColor(SDL_Point pos) const;
+    SDL_FColor getRandomColor() const;
     void blitUnit(const Window& window, SDL_FRect rect, SDL_FColor color,
         bool upWall, bool upLeftWall, bool downLeftWall) const;
     void blitDown(const Window& window, SDL_FRect rect) const;
@@ -43,9 +54,8 @@ class Board {
     // Interaction
     void reset();
     bool isLegimate(SDL_Point pos) const;
-    float getTemperature(SDL_Point pos) const;
-    float getPressure(SDL_Point pos) const;
-    float getSpeed(SDL_Point pos) const;
+    CellInfo getCellInfo(SDL_Point pos) const;
+    void applyMovement(SDL_Point pos, float val);
 
     // Calculations
     void applyForces();
@@ -56,6 +66,7 @@ class Board {
     void blitBlockNormal(const Window& window, SDL_FRect rect, int offset) const;
     void blitBlockThermal(const Window& window, SDL_FRect rect, int offset) const;
     void blitBlockPressure(const Window& window, SDL_FRect rect, int offset) const;
+    void blitBlockSpeed(const Window& window, SDL_FRect rect, int offset) const;
     void blitBlockRandom(const Window& window, SDL_FRect rect, int offset) const;
     void blitLines(const Window& window, SDL_FRect oddRect, SDL_FRect evenRect) const;
 };

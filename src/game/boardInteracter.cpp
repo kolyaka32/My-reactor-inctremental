@@ -16,7 +16,7 @@ holdingCell{} {}
 
 void BoardInteracter::reset() {
     board.reset();
-    showState = ShowState::Normal;
+    //showState = ShowState::Normal;
 }
 
 void BoardInteracter::setShowState(unsigned _state) {
@@ -44,16 +44,12 @@ bool BoardInteracter::isLegimate(SDL_Point _pos) const {
     return board.isLegimate(_pos);
 }
 
-float BoardInteracter::getTemperature(SDL_Point _pos) const {
-    return board.getTemperature(_pos);
+CellInfo BoardInteracter::getCellInfo(SDL_Point _pos) const {
+    return board.getCellInfo(_pos);
 }
 
-float BoardInteracter::getPressure(SDL_Point _pos) const {
-    return board.getPressure(_pos);
-}
-
-float BoardInteracter::getSpeed(SDL_Point _pos) const {
-    return board.getSpeed(_pos);
+void BoardInteracter::applyMovement(SDL_Point _pos, float _val) {
+    board.applyMovement(_pos, _val);
 }
 
 void BoardInteracter::update() {
@@ -78,6 +74,11 @@ void BoardInteracter::blit() const {
     case ShowState::Pressure:
         board.blitBlockPressure(window, oddRectLocal, 0);
         board.blitBlockPressure(window, evenRectLocal, 1);
+        break;
+
+    case ShowState::Speed:
+        board.blitBlockSpeed(window, oddRectLocal, 0);
+        board.blitBlockSpeed(window, evenRectLocal, 1);
         break;
 
     case ShowState::Random:

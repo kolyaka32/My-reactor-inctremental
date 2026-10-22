@@ -11,16 +11,16 @@ ControlMenu::ControlMenu(const Window& _window, float _X, float _Y, float _panel
 interacter(_interacter),
 panelBackplate(_window, _panelW/2, 0.5, _panelW, 1.0, 2.0, GREY, BLACK),
 modeText(_window, {"Show mode:", "Режим отображения:"}, {_panelW/2, 0.15, .frame=1}),
-modeSwitchBox(_window, {_panelW/2, 0.185, .textColor = BLACK, .backColor = WHITE}, 0.14,
-    {{"Elements", "Элементы"}, {"Thermal", "Температурный"}, {"Pressure", "Давление"}, {"Random", "Случайные"}}),
+modeSwitchBox(_window, {_panelW/2, 0.185, .textColor = BLACK, .backColor = WHITE}, 0.14, {{"Elements", "Элементы"},
+    {"Thermal", "Температурный"}, {"Pressure", "Давление"}, {"Speed", "Скорость"}, {"Random", "Случайные"}}),
 pickedElement(_window, {"Element: %d %d", "Элемент: %d %d"},
-    {_panelW/4, 0.3, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
-pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
-    {_panelW/4, 0.33, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
-pickedTemperature(_window, {"Temperature: %4.1f", "Температура: %4.1f"},
     {_panelW/4, 0.36, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
-pickedSpeed(_window, {"Speed: %3.1f %3.1f %3.1f", "Скорость: %3.1f %3.1f %3.1f"},
+pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
     {_panelW/4, 0.39, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
+pickedTemperature(_window, {"Temperature: %4.1f", "Температура: %4.1f"},
+    {_panelW/4, 0.42, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
+pickedSpeed(_window, {"Speed: %3.1f %3.1f %3.1f", "Скорость: %3.1f %3.1f %3.1f"},
+    {_panelW/4, 0.45, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
 buildText(_window, {"Build object:", "Объект постройки:"}, {_panelW/2, 0.5, .frame=1}),
 buildSwitchBox(_window, {_panelW/2, 0.535, .textColor = BLACK, .backColor = WHITE}, 0.14,
     {{"Not selected", "Не выбран"}, {"Demplish", "Снести"}, {"Wall", "Стена"}, {"Vent", "Вентилятор"},
@@ -117,10 +117,11 @@ void ControlMenu::update(const Mouse _mouse) {
         case SDL_BUTTON_LMASK:
             // Check, if try to do build
             // !
-
+            interacter.applyMovement(pos, 1.0);
             break;
 
         case SDL_BUTTON_RMASK:
+            interacter.applyMovement(pos, -1.0);
             //interacter.applyTemperature(position, 1.0);
             break;
 
@@ -136,9 +137,10 @@ void ControlMenu::update(const Mouse _mouse) {
             break;
         }
         // Update showing parameter
-        pickedPressure.setValues(interacter.getPressure(pos));
-        pickedTemperature.setValues(interacter.getTemperature(pos));
-        pickedSpeed.setValues(interacter.getSpeed(pos), 0.0f, 0.0f);
+        CellInfo info = interacter.getCellInfo(pos);
+        pickedTemperature.setValues(info.temperature);
+        pickedPressure.setValues(info.pressure);
+        pickedSpeed.setValues(info.speedUp, info.speedLeftUp, info.speedLeftDown);
     } else {
         pickedPressure.setValues(0.0f);
         pickedTemperature.setValues(0.0f);

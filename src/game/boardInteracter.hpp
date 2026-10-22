@@ -15,6 +15,7 @@ enum class ShowState {
     Normal,
     Thermal,
     Pressure,
+    Speed,
     Random,
 };
 
@@ -30,14 +31,12 @@ private:
 public:
     BoardInteracter(const Window& window);
 
-    // Interacting with scale and position
     void reset();
     void setShowState(unsigned state);
     SDL_Point getPosition(const Mouse mouse) const;
     bool isLegimate(SDL_Point pos) const;
-    float getTemperature(SDL_Point pos) const;
-    float getPressure(SDL_Point pos) const;
-    float getSpeed(SDL_Point pos) const;
+    CellInfo getCellInfo(SDL_Point pos) const;
+    void applyMovement(SDL_Point pos, float val);
 
     // Cycle
     void update();

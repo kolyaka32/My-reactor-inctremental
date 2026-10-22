@@ -17,7 +17,11 @@ public:
     Channel();
     void reset();
 
-    bool wall;  // Is channel is accesible to change
+    //bool wall;  // Is channel is accesible to change
+    Uint8 width;  // Width of chanel (0 if wall)
     float sp;  // Speed
+
+    void setWall();
+    bool isWall() const;
     void tryAdd(float val);
 };

@@ -159,12 +159,8 @@ SDL_FColor Cell::getPressureColor() const {
         return {pressure*drawPressureKoef, 0.0, 0.0, 1.0};
     }
     // If less - blue
-    if (pressure < 1.0/drawPressureKoef) {
+    if (pressure < -1.0/drawPressureKoef) {
         return {0.0, 0.0, 1.0, 1.0};
     }
-    return {0.0, 0.0, pressure*drawPressureKoef, 1.0};
-}
-
-SDL_FColor Cell::getRandomColor() const {
-    return {SDL_randf(), SDL_randf(), SDL_randf()};
+    return {0.0, 0.0, -pressure*drawPressureKoef, 1.0};
 }

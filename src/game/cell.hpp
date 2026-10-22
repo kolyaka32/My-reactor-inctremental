@@ -57,5 +57,4 @@ public:
     SDL_FColor getNormalColor() const;
     SDL_FColor getThermalColor() const;
     SDL_FColor getPressureColor() const;
-    SDL_FColor getRandomColor() const;
 };

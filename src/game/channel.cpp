@@ -10,11 +10,17 @@ Channel::Channel() {}
 
 void Channel::reset() {
     sp = 0.0;
-    wall = false;
+    width = 1;
+}
+
+void Channel::setWall() {
+    width = 0;
+}
+
+bool Channel::isWall() const {
+    return width == 0;
 }
 
 void Channel::tryAdd(float _val) {
-    if (!wall) {
-        sp += _val;
-    }
+    sp += _val*width;
 }
