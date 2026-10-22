@@ -28,25 +28,15 @@ ChannelPos BoardInteracter::getPosition(const Mouse _mouse) const {
     local.x -= oddRect.w/2;
     local.y -= oddRect.h/2;
 
-    int x = SDL_roundf(local.x*4/oddRect.w/3);
-    int y = SDL_roundf(local.y/oddRect.h);
-
-    float frac_q = -local.x*2/oddRect.w/3 + local.y/oddRect.h;
-    float frac_r = local.x/oddRect.w + local.y/oddRect.h/2;
-    //float frac_s = -frac_q-frac_r;
+    float frac_q = local.x*4/oddRect.w/3;
+    float frac_r = -local.x*2/oddRect.w/3 + local.y/oddRect.h;
+    float frac_s = -frac_q-frac_r;
 
     int q = SDL_roundf(frac_q);
     int r = SDL_roundf(frac_r);
-    //int s = SDL_roundf(frac_s);
+    int s = SDL_roundf(frac_s);
 
-    if (y % 2 == 0) {
-        //
-        if (SDL_fabs(r - frac_r)) {
-            //
-        }
-    }
-
-    /*float q_diff = SDL_fabs(q - frac_q);
+    float q_diff = SDL_fabs(q - frac_q);
     float r_diff = SDL_fabs(r - frac_r);
     float s_diff = SDL_fabs(s - frac_s);
 
@@ -54,30 +44,45 @@ ChannelPos BoardInteracter::getPosition(const Mouse _mouse) const {
         q = -r - s;
     } else if (r_diff > s_diff) {
         r = -q - s;
-    }*/
-
+    }
     // Deciding type
     int type = 0;
     const float border = 0.4;
-    /*if (r % 2 == 0) {
-        if (SDL_fabs(q - frac_q) > border) {
-            type = 1;  // Vertical
-        } else if (false) {
-            type = 2;  // Left upper
-        } else if (false) {
-            type = 3;  // Left down
+    // Left down
+    float leftDown = frac_r/2-frac_q/2;
+    if ((r+q) % 2 == 0) {
+        if (SDL_fabs(leftDown - SDL_roundf(leftDown)) > border) {
+            type = 3;
         }
     } else {
-        if (SDL_fabs(q - frac_q) < 0.5-border) {
-            type = 1;  // Vertical
-        } else if (false) {
-            type = 2;  // Left upper
-        } else if (false) {
-            type = 3;  // Left down
+        if (SDL_fabs(leftDown - SDL_roundf(leftDown)) < 0.5-border) {
+            type = 3;
         }
-        //return {type, x, SDL_fabs(q - frac_q)};
-    }*/
-    return {type, x, r};
+    }
+    // Left upper
+    float leftUp = frac_r/2+frac_q;
+    if (r % 2 == 0) {
+        if (SDL_fabs(leftUp - SDL_roundf(leftUp)) > border) {
+            type = 2;
+        }
+    } else {
+        if (SDL_fabs(leftUp - SDL_roundf(leftUp)) < 0.5-border) {
+            type = 2;
+        }
+    }
+    // Vertical
+    float up = frac_r+frac_q/2;
+    if (q % 2 == 0) {
+        if (SDL_fabs(up - SDL_roundf(up)) > border) {
+            type = 1;
+        }
+        return {type, q, r+q/2};
+    } else {
+        if (SDL_fabs(up - SDL_roundf(up)) < 0.5-border) {
+            type = 1;
+        }
+        return {type, q, r+(q-1)/2};
+    }
 }
 
 bool BoardInteracter::isLegimate(ChannelPos _pos) const {

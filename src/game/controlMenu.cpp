@@ -13,7 +13,7 @@ panelBackplate(_window, _panelW/2, 0.5, _panelW, 1.0, 2.0, GREY, BLACK),
 modeText(_window, {"Show mode:", "Режим отображения:"}, {_panelW/2, 0.15, .frame=1}),
 modeSwitchBox(_window, {_panelW/2, 0.185, .textColor = BLACK, .backColor = WHITE}, 0.14, {{"Elements", "Элементы"},
     {"Thermal", "Температурный"}, {"Pressure", "Давление"}, {"Speed", "Скорость"}, {"Random", "Случайные"}}),
-pickedElement(_window, {"Element: %f %f", "Элемент: %f %f"},
+pickedElement(_window, {"Element: %d %d", "Элемент: %d %d"},
     {_panelW/4, 0.36, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
 pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
     {_panelW/4, 0.39, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
@@ -144,7 +144,7 @@ void ControlMenu::update(const Mouse _mouse) {
             break;
         }
         // Update showing parameter
-        /*CellInfo info = interacter.getInfo(pos);
+        CellInfo info = interacter.getInfo(pos);
         switch (pos.type) {
         case 0:
             pickedTemperature.setValues(info.temperature);
@@ -162,7 +162,7 @@ void ControlMenu::update(const Mouse _mouse) {
         default:
             pickedLeftDownSpeed.setValues(info.speed);
             break;
-        }*/
+        }
     } else {
         pickedPressure.setValues(0.0f);
         pickedTemperature.setValues(0.0f);
