@@ -94,7 +94,6 @@ CellInfo Board::getInfo(ChannelPos _pos) const {
 void Board::applyMovement(ChannelPos _pos, float _val) {
     switch (_pos.type) {
     case 0:  // Cell
-        // Nothing
         cells[_pos.y*width+_pos.x].temperature += _val;
         return;
 
@@ -108,6 +107,26 @@ void Board::applyMovement(ChannelPos _pos, float _val) {
 
     default:  // Left down channel
         downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].sp += _val;
+        return;
+    }
+}
+
+void Board::applyAction(ChannelPos _pos) {
+    switch (_pos.type) {
+    case 0:  // Cell
+        // Nothing
+        return;
+
+    case 1:  // Up channel
+        upChannels[_pos.y*width+_pos.x].switchState();
+        return;
+
+    case 2:  // Left up channel
+        upLeftChannels[_pos.y*(width+1)+_pos.x].switchState();
+        return;
+
+    default:  // Left down channel
+        downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].switchState();
         return;
     }
 }

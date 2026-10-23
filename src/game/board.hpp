@@ -62,6 +62,7 @@ class Board {
     bool isLegimate(ChannelPos pos) const;
     CellInfo getInfo(ChannelPos pos) const;
     void applyMovement(ChannelPos pos, float val);
+    void applyAction(ChannelPos pos);
 
     // Calculations
     void applyForces();

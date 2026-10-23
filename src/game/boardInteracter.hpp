@@ -37,6 +37,7 @@ public:
     bool isLegimate(ChannelPos pos) const;
     CellInfo getInfo(ChannelPos pos) const;
     void applyMovement(ChannelPos pos, float val);
+    void applyAction(ChannelPos pos);
 
     // Cycle
     void update();

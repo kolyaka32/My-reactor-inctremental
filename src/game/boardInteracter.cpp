@@ -97,6 +97,10 @@ void BoardInteracter::applyMovement(ChannelPos _pos, float _val) {
     board.applyMovement(_pos, _val);
 }
 
+void BoardInteracter::applyAction(ChannelPos _pos) {
+    board.applyAction(_pos);
+}
+
 void BoardInteracter::update() {
     // Updating physic
     board.applyForces();

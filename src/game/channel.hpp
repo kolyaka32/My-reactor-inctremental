@@ -10,18 +10,14 @@
 
 // Transition between two cells
 class Channel {
-private:
-    /* data */
-
 public:
-    Channel();
-    void reset();
-
-    //bool wall;  // Is channel is accesible to change
     Uint8 width;  // Width of chanel (0 if wall)
     float sp;  // Speed
 
+    Channel();
+    void reset();
     void setWall();
+    void switchState();
     bool isWall() const;
     void tryAdd(float val);
 };

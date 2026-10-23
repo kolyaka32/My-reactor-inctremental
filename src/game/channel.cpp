@@ -14,7 +14,13 @@ void Channel::reset() {
 }
 
 void Channel::setWall() {
+    sp = 0.0;
     width = 0;
+}
+
+void Channel::switchState() {
+    sp = 0.0;
+    width = 1-width;
 }
 
 bool Channel::isWall() const {

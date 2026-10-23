@@ -63,13 +63,21 @@ bool ControlMenu::click(const Mouse _mouse) {
         }
         return true;
     }
-    // Check, if start interaction
-    mousePress = _mouse.getState();
-
-    // Start camera movement
-    if (_mouse.getState() == SDL_BUTTON_MMASK) {
+    switch (_mouse.getState()) {
+    case SDL_BUTTON_MMASK:  // Start camera movement
         interacter.grid.click(_mouse.getX(), _mouse.getY());
+    case SDL_BUTTON_LMASK:  // Apply movement
+    case SDL_BUTTON_RMASK:
+        mousePress = _mouse.getState();
         return true;
+
+    case SDL_BUTTON_X1MASK:  // Apply action
+        pos = interacter.getPosition(_mouse);
+        interacter.applyAction(pos);
+        return true;
+
+    default:
+        break;
     }
     return false;
 }
@@ -122,22 +130,13 @@ void ControlMenu::update(const Mouse _mouse) {
         // Check pressing on field
         switch (mousePress) {
         case SDL_BUTTON_LMASK:
-            // Check, if try to do build
+            // Check, if try to build
             // !
             interacter.applyMovement(pos, 1.0);
             break;
 
         case SDL_BUTTON_RMASK:
             interacter.applyMovement(pos, -1.0);
-            //interacter.applyTemperature(position, 1.0);
-            break;
-
-        case SDL_BUTTON_X1MASK:
-            //interacter.reduceMass(position, 2);
-            break;
-
-        case SDL_BUTTON_X2MASK:
-            //interacter.applyTemperature(position, -1.0);
             break;
 
         default:
@@ -178,6 +177,7 @@ void ControlMenu::blit() const {
     modeText.blit();
     modeSwitchBox.blit();
 
+    // Selected element
     pickedElement.blit();
     switch (pos.type) {
     case 0:  // Cell
