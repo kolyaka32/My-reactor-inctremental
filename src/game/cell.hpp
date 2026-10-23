@@ -15,7 +15,6 @@ private:
     // Required 3 from 4 paramters: mass, presure, temperature, volume
     // Volume is constant and = 1
     /*float mass;         // [kg]
-    float temperature;  // [K]
     // Inter-cycle variables for temporary storage
     float newMass;      // [kg]
     float newEnergy;    // [J]
@@ -30,7 +29,7 @@ private:
 public:
     Cell();
     //Cell(float pressure, float temperature);
-    void reset();
+    void reset(int pos = 0);
 
     float temperature;  // [K]
     float pressure;  // [Pa]

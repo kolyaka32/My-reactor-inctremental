@@ -25,7 +25,7 @@ Board::~Board() noexcept {
 
 void Board::reset() {
     for (int i=0; i < height*width; ++i) {
-        cells[i].reset();
+        cells[i].reset(i);
     }
     for (int i=0; i < (height+1)*width; ++i) {
         upChannels[i].reset();
