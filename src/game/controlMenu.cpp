@@ -73,7 +73,9 @@ bool ControlMenu::click(const Mouse _mouse) {
 
     case SDL_BUTTON_X1MASK:  // Apply action
         pos = interacter.getPosition(_mouse);
-        interacter.applyAction(pos);
+        if (interacter.isLegimate(pos)) {
+            interacter.applyAction(pos);
+        }
         return true;
 
     default:

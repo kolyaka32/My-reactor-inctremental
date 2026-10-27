@@ -62,15 +62,20 @@ bool Board::isLegimate(ChannelPos _pos) const {
 
     case 1:  // Up channel
         return _pos.x >= 0 && _pos.x < width &&
-            _pos.y >= 0 && _pos.y < height+1;
+            _pos.y > 0 && _pos.y < height;
 
     case 2:  // Left up channel
-        return _pos.x >= 0 && _pos.x < width &&
+        return _pos.x > 0 && _pos.x < width &&
             _pos.y >= 0 && _pos.y < height;
 
     default:  // Left down channel
-        return _pos.x >= 0 && _pos.x < width &&
-            _pos.y >= 0 && _pos.y < height;
+        if (_pos.x % 2 == 0) {
+            return _pos.x > 0 && _pos.x < width &&
+                _pos.y > 0 && _pos.y < height;
+        } else {
+            return _pos.x > 0 && _pos.x < width &&
+                _pos.y >= 0 && _pos.y < height-1;
+        }
     }
 }
 
@@ -329,8 +334,9 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
     }
 
     // Right border
+    _oddRect.x -= _oddRect.w * 1.5;
+    _evenRect.x -= _evenRect.w * 1.5;
     if (width%2 == 0) {
-        _evenRect.x -= _evenRect.w * 1.5;
         for (int y=0; y < height; ++y) {
             if (upLeftChannels[(width+1)*y+width].isWall()) {
                 blitDownRight(_window, _evenRect);
@@ -340,10 +346,7 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
             }
             _evenRect.y += _evenRect.h;
         }
-        _oddRect.y += _oddRect.h*(height-1);
-        _evenRect.y -= _evenRect.h;
     } else {
-        _oddRect.x -= _oddRect.w * 1.5;
         for (int y=0; y < height; ++y) {\
             if (upLeftChannels[y*(width+1)+width].isWall()) {
                 blitDownRight(_window, _oddRect);
@@ -353,9 +356,9 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
             }
             _oddRect.y += _oddRect.h;
         }
-        _evenRect.y += _evenRect.h*(height-1);
-        _oddRect.y -= _oddRect.h;
     }
+    _oddRect.y += _oddRect.h*(height-1);
+    _evenRect.y += _evenRect.h*(height-1);
 
     // Down border
     _oddRect.x = startOddX;
