@@ -16,7 +16,6 @@ holdingCell{} {}
 
 void BoardInteracter::reset() {
     board.reset();
-    //showState = ShowState::Normal;
 }
 
 void BoardInteracter::setShowState(unsigned _state) {
@@ -33,8 +32,11 @@ ChannelPos BoardInteracter::getPosition(const Mouse _mouse) const {
     float frac_s = -frac_q-frac_r;
 
     int q = SDL_roundf(frac_q);
+    int qn = SDL_roundf(frac_q+0.5);
     int r = SDL_roundf(frac_r);
     int s = SDL_roundf(frac_s);
+    int y =  SDL_roundf(frac_r+frac_q/2);
+    int yn = SDL_roundf(frac_r+(frac_q+1)/2);
 
     float q_diff = SDL_fabs(q - frac_q);
     float r_diff = SDL_fabs(r - frac_r);
@@ -46,42 +48,48 @@ ChannelPos BoardInteracter::getPosition(const Mouse _mouse) const {
         r = -q - s;
     }
     // Deciding type
-    int type = 0;
     const float border = 0.4;
     // Left down
     float leftDown = frac_r/2-frac_q/2;
-    if ((r+q) % 2 == 0) {
+    if (s % 2 == 0) {
         if (SDL_fabs(leftDown - SDL_roundf(leftDown)) > border) {
-            type = 3;
+            /*if (r % 2 == 0) {
+                return {3, -10, -10};
+            }*/
+            // ! fix
+            return {3, qn, y};
         }
     } else {
         if (SDL_fabs(leftDown - SDL_roundf(leftDown)) < 0.5-border) {
-            type = 3;
+            /*if (r % 2 == 0) {
+                return {3, -10, -10};
+            }*/
+            return {3, qn, y};
         }
     }
     // Left upper
     float leftUp = frac_r/2+frac_q;
     if (r % 2 == 0) {
         if (SDL_fabs(leftUp - SDL_roundf(leftUp)) > border) {
-            type = 2;
+            return {2, qn, y};
         }
     } else {
         if (SDL_fabs(leftUp - SDL_roundf(leftUp)) < 0.5-border) {
-            type = 2;
+            return {2, qn, y};
         }
     }
     // Vertical
     float up = frac_r+frac_q/2;
     if (q % 2 == 0) {
         if (SDL_fabs(up - SDL_roundf(up)) > border) {
-            type = 1;
+            return {1, q, yn};
         }
-        return {type, q, r+q/2};
+        return {0, q, r+q/2};
     } else {
         if (SDL_fabs(up - SDL_roundf(up)) < 0.5-border) {
-            type = 1;
+            return {1, q, y};
         }
-        return {type, q, r+(q-1)/2};
+        return {0, q, r+(q-1)/2};
     }
 }
 

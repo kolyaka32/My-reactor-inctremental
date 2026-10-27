@@ -98,15 +98,15 @@ void Board::applyMovement(ChannelPos _pos, float _val) {
         return;
 
     case 1:  // Up channel
-        upChannels[_pos.y*width+_pos.x].sp += _val;
+        upChannels[_pos.y*width+_pos.x].tryAdd(_val);
         return;
 
     case 2:  // Left up channel
-        upLeftChannels[_pos.y*(width+1)+_pos.x].sp += _val;
+        upLeftChannels[_pos.y*(width+1)+_pos.x].tryAdd(_val);
         return;
 
     default:  // Left down channel
-        downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].sp += _val;
+        downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].tryAdd(_val);
         return;
     }
 }
@@ -130,13 +130,6 @@ void Board::applyAction(ChannelPos _pos) {
         return;
     }
 }
-
-/*void Board::checkNext() {
-    static int counter = 0;
-    downLeftChannels[counter].wall = true;
-    downLeftChannels[counter+1].wall = false;
-    counter = (counter+1) % ((width+1)*(height+1));
-}*/
 
 void Board::projectUnit(Cell& _cell, Channel& _c1, Channel& _c2,
     Channel& _c3, Channel& _c4, Channel& _c5, Channel& _c6) {
