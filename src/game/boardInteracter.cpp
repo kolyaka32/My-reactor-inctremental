@@ -53,18 +53,19 @@ ChannelPos BoardInteracter::getPosition(const Mouse _mouse) const {
     float leftDown = frac_r/2-frac_q/2;
     if (s % 2 == 0) {
         if (SDL_fabs(leftDown - SDL_roundf(leftDown)) > border) {
-            /*if (r % 2 == 0) {
-                return {3, -10, -10};
-            }*/
-            // ! fix
-            return {3, qn, y};
+            if (qn % 2 == 0) {
+                return {3, qn, y};
+            } else {
+                return {3, qn, y-1};
+            }
         }
     } else {
         if (SDL_fabs(leftDown - SDL_roundf(leftDown)) < 0.5-border) {
-            /*if (r % 2 == 0) {
-                return {3, -10, -10};
-            }*/
-            return {3, qn, y};
+            if (qn % 2 == 0) {
+                return {3, qn, y};
+            } else {
+                return {3, qn, y-1};
+            }
         }
     }
     // Left upper
