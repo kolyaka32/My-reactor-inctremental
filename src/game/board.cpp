@@ -117,7 +117,7 @@ Channel& Board::getUpChannel(int _x, int _y) {
 Channel& Board::getLeftUpChannel(int _x, int _y) {
     if (_x >= 0 && _x < width+1 &&
         _y >= 0 && _y < height+1) {
-        upLeftChannels[_y*(width+1)+_x];
+        return upLeftChannels[_y*(width+1)+_x];
     }
     logger.important("Innaccesible left up channel");
     return upLeftChannels[0];
@@ -126,7 +126,7 @@ Channel& Board::getLeftUpChannel(int _x, int _y) {
 Channel& Board::getLeftDownChannel(int _x, int _y) {
     if (_x >= 0 && _x < width+1 &&
         _y >= 0 && _y < height+1) {
-        downLeftChannels[_y*(width+1)+_x];
+        return downLeftChannels[_y*(width+1)+_x];
     }
     logger.important("Innaccesible left down channel");
     return downLeftChannels[0];
@@ -208,26 +208,26 @@ void Board::project() {
     // Odd cells
     for (int y=0; y < height; ++y) {
         for (int x=0; x < width; x+=2) {
-            projectUnit(cells[y*width+x],
-                upChannels[y*width+x],
-                upChannels[(y+1)*width+x],
-                upLeftChannels[y*(width+1)+x],
-                upLeftChannels[y*(width+1)+x+1],
-                downLeftChannels[(y+1)*(width+1)+x],
-                downLeftChannels[y*(width+1)+x+1]
+            projectUnit(getCell(x, y),
+                getUpChannel(x, y),
+                getUpChannel(x, y+1),
+                getLeftUpChannel(x, y),
+                getLeftUpChannel(x+1, y),
+                getLeftDownChannel(x, y+1),
+                getLeftDownChannel(x+1, y)
             );
         }
     }
     // Even cells
     for (int y=0; y < height; ++y) {
         for (int x=1; x < width; x+=2) {
-            projectUnit(cells[y*width+x],
-                upChannels[y*width+x],
-                upChannels[(y+1)*width+x],
-                upLeftChannels[y*(width+1)+x],
-                upLeftChannels[(y+1)*(width+1)+x+1],
-                downLeftChannels[y*(width+1)+x],
-                downLeftChannels[y*(width+1)+x+1]
+            projectUnit(getCell(x, y),
+                getUpChannel(x, y),
+                getUpChannel(x, y+1),
+                getLeftUpChannel(x, y),
+                getLeftUpChannel(x+1, y+1),
+                getLeftDownChannel(x, y),
+                getLeftDownChannel(x+1, y)
             );
         }
     }
@@ -238,29 +238,29 @@ void Board::advectMass() {
     // Vertical
     for (int y=1; y<height; y++) {
         for (int x=0; x<width; x++) {
-            advectMass(cells[(y-1)*width+x], cells[y*width+x], upChannels[y*width+x]);
+            advectMass(getCell(x, y-1), getCell(x, y), getUpChannel(x, y));
         }
     }
     // Up left
     for (int y=0; y<height; y++) {
         for (int x=1; x<width; x+=2) {
-            advectMass(cells[y*width+x-1], cells[y*width+x], upLeftChannels[y*(width+1)+x]);
+            advectMass(getCell(x-1, y), getCell(x, y), getLeftUpChannel(x, y));
         }
     }
     for (int y=1; y<height; y++) {
         for (int x=2; x<width; x+=2) {
-            advectMass(cells[(y-1)*width+x-1], cells[y*width+x], upLeftChannels[y*(width+1)+x]);
+            advectMass(getCell(x-1, y-1), getCell(x, y), getLeftUpChannel(x, y));
         }
     }
     // Down left
     for (int y=0; y<height-1; y++) {
         for (int x=1; x<width; x+=2) {
-            advectMass(cells[(y-1)*width+x-1], cells[y*width+x], downLeftChannels[(y+1)*(width+1)+x]);
+            advectMass(getCell(x-1, y+1), getCell(x, y), getLeftDownChannel(x, y+1));
         }
     }
     for (int y=0; y<height; y++) {
         for (int x=2; x<width; x+=2) {
-            advectMass(cells[y*width+x-1], cells[y*width+x], downLeftChannels[(y+1)*(width+1)+x]);
+            advectMass(getCell(x-1, y), getCell(x, y), getLeftDownChannel(x, y+1));
         }
     }
 }
@@ -270,29 +270,29 @@ void Board::advectSpeed() {
     // Vertical
     for (int y=0; y<height; y++) {
         for (int x=0; x<width; x++) {
-            advectSpeed(upChannels[y*width+x], upChannels[(y+1)*width+x]);
+            advectSpeed(getUpChannel(x, y), getUpChannel(x, y+1));
         }
     }
     // Up left
-    for (int y=0; y<height; y++) {
-        for (int x=0; x<width; x+=2) {
-            advectSpeed(upLeftChannels[y*(width+1)+x], upLeftChannels[y*(width+1)+x+1]);
-        }
-    }
     for (int y=0; y<height-1; y++) {
         for (int x=1; x<width; x+=2) {
-            advectSpeed(upLeftChannels[y*(width+1)+x], upLeftChannels[(y+1)*(width+1)+x+1]);
+            advectSpeed(getLeftUpChannel(x, y), getLeftUpChannel(x+1, y+1));
+        }
+    }
+    for (int y=0; y<height; y++) {
+        for (int x=2; x<width; x+=2) {
+            advectSpeed(getLeftUpChannel(x, y), getLeftUpChannel(x+1, y));
         }
     }
     // Down left
-    for (int y=1; y<height; y++) {
-        for (int x=0; x<width; x+=2) {
-            advectSpeed(downLeftChannels[y*(width+1)+x], downLeftChannels[y*(width+1)+x]);
-        }
-    }
     for (int y=0; y<height-1; y++) {
         for (int x=1; x<width; x+=2) {
-            advectSpeed(downLeftChannels[y*(width+1)+x], downLeftChannels[y*(width+1)+x]);
+            advectSpeed(getLeftDownChannel(x-1, y+1), getLeftDownChannel(x, y));
+        }
+    }
+    for (int y=1; y<height; y++) {
+        for (int x=2; x<width; x+=2) {
+            advectSpeed(getLeftDownChannel(x-1, y), getLeftDownChannel(x, y));
         }
     }
 }
