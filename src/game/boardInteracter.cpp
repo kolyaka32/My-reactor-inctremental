@@ -114,7 +114,8 @@ void BoardInteracter::update() {
     // Updating physic
     board.applyForces();
     board.project();
-    board.advect();
+    board.advectMass();
+    board.advectSpeed();
     //board.applyChanges();
 }
 

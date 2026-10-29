@@ -96,22 +96,58 @@ CellInfo Board::getInfo(ChannelPos _pos) const {
     }
 }
 
+Cell& Board::getCell(int _x, int _y) {
+    if (_x >= 0 && _x < width &&
+        _y >= 0 && _y < height) {
+        return cells[_y*width+_x];
+    }
+    logger.important("Innaccesible cell");
+    return cells[0];
+}
+
+Channel& Board::getUpChannel(int _x, int _y) {
+    if (_x >= 0 && _x < width &&
+        _y >= 0 && _y < height+1) {
+        return upChannels[_y*width+_x];
+    }
+    logger.important("Innaccesible up channel");
+    return upChannels[0];
+}
+
+Channel& Board::getLeftUpChannel(int _x, int _y) {
+    if (_x >= 0 && _x < width+1 &&
+        _y >= 0 && _y < height+1) {
+        upLeftChannels[_y*(width+1)+_x];
+    }
+    logger.important("Innaccesible left up channel");
+    return upLeftChannels[0];
+}
+
+Channel& Board::getLeftDownChannel(int _x, int _y) {
+    if (_x >= 0 && _x < width+1 &&
+        _y >= 0 && _y < height+1) {
+        downLeftChannels[_y*(width+1)+_x];
+    }
+    logger.important("Innaccesible left down channel");
+    return downLeftChannels[0];
+}
+
 void Board::applyMovement(ChannelPos _pos, float _val) {
     switch (_pos.type) {
     case 0:  // Cell
-        cells[_pos.y*width+_pos.x].temperature += _val;
+        getCell(_pos.x, _pos.y).temperature += _val;
         return;
 
     case 1:  // Up channel
-        upChannels[_pos.y*width+_pos.x].tryAdd(_val);
+        getUpChannel(_pos.x, _pos.y).tryAdd(_val);
         return;
 
     case 2:  // Left up channel
-        upLeftChannels[_pos.y*(width+1)+_pos.x].tryAdd(_val);
+        getLeftUpChannel(_pos.x, _pos.y).tryAdd(_val);
         return;
 
     default:  // Left down channel
-        downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].tryAdd(_val);
+        getLeftUpChannel(_pos.x, _pos.y+1).tryAdd(_val);
         return;
     }
 }
@@ -123,36 +159,44 @@ void Board::applyAction(ChannelPos _pos) {
         return;
 
     case 1:  // Up channel
-        upChannels[_pos.y*width+_pos.x].switchState();
+        getUpChannel(_pos.x, _pos.y).switchState();
         return;
 
     case 2:  // Left up channel
-        upLeftChannels[_pos.y*(width+1)+_pos.x].switchState();
+        getLeftUpChannel(_pos.x, _pos.y).switchState();
         return;
 
     default:  // Left down channel
-        downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].switchState();
+        getLeftUpChannel(_pos.x, _pos.y+1).switchState();
         return;
     }
 }
 
-void Board::projectUnit(Cell& _cell, Channel& _c1, Channel& _c2,
-    Channel& _c3, Channel& _c4, Channel& _c5, Channel& _c6) {
+void Board::projectUnit(Cell& _cell, Channel& _h1, Channel& _h2,
+    Channel& _h3, Channel& _h4, Channel& _h5, Channel& _h6) {
     // Check wall count
-    int count = _c1.width + _c2.width + _c3.width + _c4.width + _c5.width + _c6.width;
+    int count = _h1.width + _h2.width + _h3.width + _h4.width + _h5.width + _h6.width;
     if (count) {
         // Calculate divergation
-        float div = (_c1.sp - _c2.sp + _c3.sp - _c4.sp + _c5.sp - _c6.sp)/count;
+        float div = (_h1.sp - _h2.sp + _h3.sp - _h4.sp + _h5.sp - _h6.sp)/count;
         // Avaraging divergation spread between all channels
-        _c1.tryAdd(-div);
-        _c3.tryAdd(-div);
-        _c5.tryAdd(-div);
-        _c2.tryAdd(div);
-        _c4.tryAdd(div);
-        _c6.tryAdd(div);
+        _h1.tryAdd(-div);
+        _h3.tryAdd(-div);
+        _h5.tryAdd(-div);
+        _h2.tryAdd(div);
+        _h4.tryAdd(div);
+        _h6.tryAdd(div);
         // Update pressure
         _cell.pressure += div/count;
     }
+}
+
+void Board::advectMass(Cell& _c1, Cell& _c2, Channel& _h) {
+    // ! implementation
+}
+
+void Board::advectSpeed(Channel& _h1, Channel& _h2) {
+    // ! implimentation
 }
 
 void Board::applyForces() {
@@ -189,27 +233,68 @@ void Board::project() {
     }
 }
 
-void Board::advect() {
-    // Transfer of fluid (save momentum)
-    /*float dt0 = 0.3*width;
-    for (int i=1; i<=width; i++) {
-        for (int j=1; j<=width; j++) {
-            float x = i - dt0 * u[j*width+i];
-            float y = j - dt0 * v[j*width+i];
-            if (x<0.5) x=0.5;
-            if (x>width+0.5) x=width+ 0.5;
-            if (y<0.5) y=0.5;
-            if (y>width+0.5) y=width+ 0.5;
-            int i0=(int)x;
-            int j0=(int)y;
-            float s1 = x-i0;
-            float s0 = 1-s1;
-            float t1 = y-j0;
-            float t0 = 1-t1;
-            d[j0*width+i0] = s0*(t0*d0[j0*width+i0] + t1*d0[(j0+1)*width+i0]) +
-                s1*(t0*d0[j0*width+i0+1)] + t1*d0[(j0+1)*width+i0+1]);
+void Board::advectMass() {
+    // Transfer of fluid itself (transfer between cells)
+    // Vertical
+    for (int y=1; y<height; y++) {
+        for (int x=0; x<width; x++) {
+            advectMass(cells[(y-1)*width+x], cells[y*width+x], upChannels[y*width+x]);
         }
-    }*/
+    }
+    // Up left
+    for (int y=0; y<height; y++) {
+        for (int x=1; x<width; x+=2) {
+            advectMass(cells[y*width+x-1], cells[y*width+x], upLeftChannels[y*(width+1)+x]);
+        }
+    }
+    for (int y=1; y<height; y++) {
+        for (int x=2; x<width; x+=2) {
+            advectMass(cells[(y-1)*width+x-1], cells[y*width+x], upLeftChannels[y*(width+1)+x]);
+        }
+    }
+    // Down left
+    for (int y=0; y<height-1; y++) {
+        for (int x=1; x<width; x+=2) {
+            advectMass(cells[(y-1)*width+x-1], cells[y*width+x], downLeftChannels[(y+1)*(width+1)+x]);
+        }
+    }
+    for (int y=0; y<height; y++) {
+        for (int x=2; x<width; x+=2) {
+            advectMass(cells[y*width+x-1], cells[y*width+x], downLeftChannels[(y+1)*(width+1)+x]);
+        }
+    }
+}
+
+void Board::advectSpeed() {
+    // Transfer of fluid's speed (save momentum)
+    // Vertical
+    for (int y=0; y<height; y++) {
+        for (int x=0; x<width; x++) {
+            advectSpeed(upChannels[y*width+x], upChannels[(y+1)*width+x]);
+        }
+    }
+    // Up left
+    for (int y=0; y<height; y++) {
+        for (int x=0; x<width; x+=2) {
+            advectSpeed(upLeftChannels[y*(width+1)+x], upLeftChannels[y*(width+1)+x+1]);
+        }
+    }
+    for (int y=0; y<height-1; y++) {
+        for (int x=1; x<width; x+=2) {
+            advectSpeed(upLeftChannels[y*(width+1)+x], upLeftChannels[(y+1)*(width+1)+x+1]);
+        }
+    }
+    // Down left
+    for (int y=1; y<height; y++) {
+        for (int x=0; x<width; x+=2) {
+            advectSpeed(downLeftChannels[y*(width+1)+x], downLeftChannels[y*(width+1)+x]);
+        }
+    }
+    for (int y=0; y<height-1; y++) {
+        for (int x=1; x<width; x+=2) {
+            advectSpeed(downLeftChannels[y*(width+1)+x], downLeftChannels[y*(width+1)+x]);
+        }
+    }
 }
 
 SDL_FColor Board::getSpeedColor(SDL_Point _pos) const {

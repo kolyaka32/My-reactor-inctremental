@@ -38,9 +38,16 @@ class Board {
     Channel* upLeftChannels;  // End on extra line
     Channel* downLeftChannels;  // Starting on extra upper line
 
+    Cell& getCell(int x, int y);
+    Channel& getUpChannel(int x, int y);
+    Channel& getLeftUpChannel(int x, int y);
+    Channel& getLeftDownChannel(int x, int y);
+
     // Calculations per unit
     void projectUnit(Cell& cell, Channel& upper, Channel& bottom, Channel& upperLeft,
         Channel& downRight, Channel& downLeft, Channel& upRight);
+    void advectMass(Cell& cell1, Cell& cell2, Channel& channel);
+    void advectSpeed(Channel& channel1, Channel& channel2);
 
     // Additional draw
     SDL_FColor getSpeedColor(SDL_Point pos) const;
@@ -67,7 +74,8 @@ class Board {
     // Calculations
     void applyForces();
     void project();
-    void advect();
+    void advectMass();
+    void advectSpeed();
 
     // Draw
     void blitBlockNormal(const Window& window, SDL_FRect rect, int offset) const;
