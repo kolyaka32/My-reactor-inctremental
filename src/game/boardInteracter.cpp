@@ -112,10 +112,10 @@ void BoardInteracter::applyAction(ChannelPos _pos) {
 
 void BoardInteracter::update() {
     // Updating physic
+    board.advectSpeed();
     board.applyForces();
     board.project();
     board.advectMass();
-    board.advectSpeed();
     //board.applyChanges();
 }
 

@@ -125,8 +125,8 @@ Channel& Board::getLeftUpChannel(int _x, int _y) {
 
 Channel& Board::getLeftDownChannel(int _x, int _y) {
     if (_x >= 0 && _x < width+1 &&
-        _y >= 0 && _y < height+1) {
-        return downLeftChannels[_y*(width+1)+_x];
+        _y >= -1 && _y < height) {
+        return downLeftChannels[(_y+1)*(width+1)+_x];
     }
     logger.important("Innaccesible left down channel");
     return downLeftChannels[0];
@@ -134,40 +134,40 @@ Channel& Board::getLeftDownChannel(int _x, int _y) {
 
 void Board::applyMovement(ChannelPos _pos, float _val) {
     switch (_pos.type) {
-    case 0:  // Cell
+    case 0:
         getCell(_pos.x, _pos.y).temperature += _val;
         return;
 
-    case 1:  // Up channel
+    case 1:
         getUpChannel(_pos.x, _pos.y).tryAdd(_val);
         return;
 
-    case 2:  // Left up channel
+    case 2:
         getLeftUpChannel(_pos.x, _pos.y).tryAdd(_val);
         return;
 
-    default:  // Left down channel
-        getLeftUpChannel(_pos.x, _pos.y+1).tryAdd(_val);
+    default:
+        getLeftDownChannel(_pos.x, _pos.y).tryAdd(_val);
         return;
     }
 }
 
 void Board::applyAction(ChannelPos _pos) {
     switch (_pos.type) {
-    case 0:  // Cell
+    case 0:
         // Nothing
         return;
 
-    case 1:  // Up channel
+    case 1:
         getUpChannel(_pos.x, _pos.y).switchState();
         return;
 
-    case 2:  // Left up channel
+    case 2:
         getLeftUpChannel(_pos.x, _pos.y).switchState();
         return;
 
-    default:  // Left down channel
-        getLeftUpChannel(_pos.x, _pos.y+1).switchState();
+    default:
+        getLeftDownChannel(_pos.x, _pos.y).switchState();
         return;
     }
 }
@@ -196,7 +196,12 @@ void Board::advectMass(Cell& _c1, Cell& _c2, Channel& _h) {
 }
 
 void Board::advectSpeed(Channel& _h1, Channel& _h2) {
-    // ! implimentation
+    if (_h1.isWall() || _h2.isWall()) {
+        return;
+    }
+    float avr = (_h1.sp - _h2.sp)/2;
+    _h1.sp -= avr;
+    _h2.sp += avr;
 }
 
 void Board::applyForces() {
@@ -213,8 +218,8 @@ void Board::project() {
                 getUpChannel(x, y+1),
                 getLeftUpChannel(x, y),
                 getLeftUpChannel(x+1, y),
-                getLeftDownChannel(x, y+1),
-                getLeftDownChannel(x+1, y)
+                getLeftDownChannel(x, y),
+                getLeftDownChannel(x+1, y-1)
             );
         }
     }
@@ -255,12 +260,12 @@ void Board::advectMass() {
     // Down left
     for (int y=0; y<height-1; y++) {
         for (int x=1; x<width; x+=2) {
-            advectMass(getCell(x-1, y+1), getCell(x, y), getLeftDownChannel(x, y+1));
+            advectMass(getCell(x-1, y+1), getCell(x, y), getLeftDownChannel(x, y));
         }
     }
     for (int y=0; y<height; y++) {
         for (int x=2; x<width; x+=2) {
-            advectMass(getCell(x-1, y), getCell(x, y), getLeftDownChannel(x, y+1));
+            advectMass(getCell(x-1, y), getCell(x, y), getLeftDownChannel(x, y));
         }
     }
 }
@@ -298,9 +303,9 @@ void Board::advectSpeed() {
 }
 
 SDL_FColor Board::getSpeedColor(SDL_Point _pos) const {
-    return {upChannels[_pos.y*(width+1)+_pos.x].sp/10.0f,
-        upLeftChannels[_pos.y*(width+1)+_pos.x].sp/10.0f,
-        downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].sp/10.0f};
+    return {upChannels[_pos.y*(width+1)+_pos.x].sp/10.0f+0.5f,
+        upLeftChannels[_pos.y*(width+1)+_pos.x].sp/10.0f+0.5f,
+        downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].sp/10.0f+0.5f};
 }
 
 SDL_FColor Board::getRandomColor() const {
