@@ -192,7 +192,14 @@ void Board::projectUnit(Cell& _cell, Channel& _h1, Channel& _h2,
 }
 
 void Board::advectMass(Cell& _c1, Cell& _c2, Channel& _h) {
-    // ! implementation
+    if (_h.isWall()) {
+        return;
+    }
+    if (_h.sp > 0) {
+        _c2.temperature += (_c1.temperature - _c2.temperature)*_h.sp/(_h.sp+10.0f)/2;
+    } else {
+        _c1.temperature += (_c1.temperature - _c2.temperature)*_h.sp/(_h.sp+10.0f)/2;
+    }
 }
 
 void Board::advectSpeed(Channel& _h1, Channel& _h2) {
