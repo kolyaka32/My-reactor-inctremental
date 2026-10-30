@@ -30,6 +30,7 @@ class ControlMenu : public GUI::Template {
     GUI::StaticText buildText;
     GUI::SwitchBox buildSwitchBox;
     GUI::TextButton resetButton;
+    GUI::StaticText stoppedText;
 
  public:
     ControlMenu(const Window& window, float boardX, float boardY, float panelW, BoardInteracter& interacter);

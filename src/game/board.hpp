@@ -44,6 +44,7 @@ class Board {
     Channel& getLeftDownChannel(int x, int y);
 
     // Calculations per unit
+    const float resistance = 0.4;
     void projectUnit(Cell& cell, Channel& upper, Channel& bottom, Channel& upperLeft,
         Channel& downRight, Channel& downLeft, Channel& upRight);
     void advectMass(Cell& cell1, Cell& cell2, Channel& channel);

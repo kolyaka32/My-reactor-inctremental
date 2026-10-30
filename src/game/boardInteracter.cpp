@@ -6,6 +6,8 @@
 #include "boardInteracter.hpp"
 
 
+bool BoardInteracter::running = true;
+
 BoardInteracter::BoardInteracter(const Window& _window)
 : Template(_window),
 board(11, 10),
@@ -112,11 +114,13 @@ void BoardInteracter::applyAction(ChannelPos _pos) {
 
 void BoardInteracter::update() {
     // Updating physic
-    board.advectSpeed();
-    board.applyForces();
-    board.advectMass();
-    board.project();
-    //board.applyChanges();
+    if (running) {
+        board.advectSpeed();
+        board.applyForces();
+        board.advectMass();
+        board.project();
+        //board.applyChanges();
+    }
 }
 
 void BoardInteracter::blit() const {

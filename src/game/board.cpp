@@ -206,7 +206,7 @@ void Board::advectSpeed(Channel& _h1, Channel& _h2) {
     if (_h1.isWall() || _h2.isWall()) {
         return;
     }
-    float avr = (_h1.sp - _h2.sp)/2;
+    float avr = (_h1.sp - _h2.sp)/2*resistance;
     _h1.sp -= avr;
     _h2.sp += avr;
 }

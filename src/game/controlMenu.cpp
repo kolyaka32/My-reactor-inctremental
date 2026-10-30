@@ -29,7 +29,8 @@ buildText(_window, {"Build object:", "Объект постройки:"}, {_pane
 buildSwitchBox(_window, {_panelW/2, 0.535, .textColor = BLACK, .backColor = WHITE}, 0.14,
     {{"Not selected", "Не выбран"}, {"Demplish", "Снести"}, {"Wall", "Стена"}, {"Vent", "Вентилятор"},
     {"Heater", "Нагреватель"}, {"Check valve", "Обратный клапан"}, {"Cooler", "Холодильник"}}),
-resetButton(_window, {"Reset", "Сброс"}, {_panelW/2, 0.8, .frame=1}) {}
+resetButton(_window, {"Reset", "Сброс"}, {_panelW/2, 0.8, .frame=1}),
+stoppedText(_window, {"Stopped", "Остановленно"}, {0.5, 0.05, .frame=1}) {}
 
 void ControlMenu::reset() {
     mousePress = 0;
@@ -104,6 +105,10 @@ bool ControlMenu::press(SDL_Keycode _key) {
     if (_key == SDLK_R) {
         // Check, if try rotate part
         // ! interacter.holdingCell.rotate();
+        return true;
+    }
+    if (_key == SDLK_SPACE) {
+        BoardInteracter::running ^= true;
         return true;
     }
     if (buildSwitchBox.press(_key)) {
@@ -202,6 +207,10 @@ void ControlMenu::blit() const {
     buildText.blit();
     buildSwitchBox.blit();
     resetButton.blit();
+
+    if (!BoardInteracter::running) {
+        stoppedText.blit();
+    }
 
     // Building
     /*if (buildSwitchBox.getValue() != 0) {

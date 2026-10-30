@@ -46,6 +46,8 @@ public:
     // Interaction
     Grid grid;
 
+    static bool running;
+
     // Current selected object
     ChannelPos pos;
     Cell holdingCell;
