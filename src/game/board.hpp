@@ -53,8 +53,9 @@ class Board {
     // Additional draw
     SDL_FColor getSpeedColor(SDL_Point pos) const;
     SDL_FColor getRandomColor() const;
-    void blitUnit(const Window& window, SDL_FRect rect, SDL_FColor color,
-        bool upWall, bool upLeftWall, bool downLeftWall) const;
+    void blitUnit(const Window& window, SDL_FRect rect, SDL_FColor color) const;
+    void blitWalls(const Window& window, SDL_FRect rect, bool upWall, bool upLeftWall,
+        bool downLeftWall) const;
     void blitDown(const Window& window, SDL_FRect rect) const;
     void blitUpperRight(const Window& window, SDL_FRect rect) const;
     void blitDownRight(const Window& window, SDL_FRect rect) const;
