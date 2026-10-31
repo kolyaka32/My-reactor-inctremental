@@ -65,13 +65,18 @@ bool Board::isLegimate(ChannelPos _pos) const {
             _pos.y > 0 && _pos.y < height;
 
     case 2:  // Left up channel
-        return _pos.x > 0 && _pos.x < width &&
-            _pos.y >= 0 && _pos.y < height;
+        if (_pos.x % 2 == 0) {
+            return _pos.x > 0 && _pos.x < width &&
+                _pos.y > 0 && _pos.y < height;
+        } else {
+            return _pos.x > 0 && _pos.x < width &&
+                _pos.y >= 0 && _pos.y < height;
+        }
 
     default:  // Left down channel
         if (_pos.x % 2 == 0) {
             return _pos.x > 0 && _pos.x < width &&
-                _pos.y > 0 && _pos.y < height;
+                _pos.y >= 0 && _pos.y < height;
         } else {
             return _pos.x > 0 && _pos.x < width &&
                 _pos.y >= 0 && _pos.y < height-1;
@@ -97,39 +102,39 @@ CellInfo Board::getInfo(ChannelPos _pos) const {
 }
 
 Cell& Board::getCell(int _x, int _y) {
-    if (_x >= 0 && _x < width &&
-        _y >= 0 && _y < height) {
-        return cells[_y*width+_x];
+    if (_x < 0 || _x >= width ||
+        _y < 0 || _y >= height) {
+        logger.important("Innaccesible cell");
+        return cells[0];
     }
-    logger.important("Innaccesible cell");
-    return cells[0];
+    return cells[_y*width+_x];
 }
 
 Channel& Board::getUpChannel(int _x, int _y) {
-    if (_x >= 0 && _x < width &&
-        _y >= 0 && _y < height+1) {
-        return upChannels[_y*width+_x];
+    if (_x < 0 || _x >= width ||
+        _y < 0 || _y > height) {
+        logger.important("Innaccesible up channel");
+        return upChannels[0];
     }
-    logger.important("Innaccesible up channel");
-    return upChannels[0];
+    return upChannels[_y*width+_x];
 }
 
 Channel& Board::getLeftUpChannel(int _x, int _y) {
-    if (_x >= 0 && _x < width+1 &&
-        _y >= 0 && _y < height+1) {
-        return upLeftChannels[_y*(width+1)+_x];
+    if (_x < 0 || _x > width ||
+        _y < 0 || _y > height) {
+        logger.important("Innaccesible left up channel");
+        return upLeftChannels[0];
     }
-    logger.important("Innaccesible left up channel");
-    return upLeftChannels[0];
+    return upLeftChannels[_y*(width+1)+_x];
 }
 
 Channel& Board::getLeftDownChannel(int _x, int _y) {
-    if (_x >= 0 && _x < width+1 &&
-        _y >= -1 && _y < height) {
-        return downLeftChannels[(_y+1)*(width+1)+_x];
+    if (_x < 0 || _x > width ||
+        _y < -1 || _y >= height) {
+        logger.important("Innaccesible left down channel");
+        return downLeftChannels[0];
     }
-    logger.important("Innaccesible left down channel");
-    return downLeftChannels[0];
+    return downLeftChannels[(_y+1)*(width+1)+_x];
 }
 
 void Board::applyMovement(ChannelPos _pos, float _val) {
@@ -443,6 +448,8 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
             }
             _evenRect.y += _evenRect.h;
         }
+        _oddRect.y += _oddRect.h*(height-1);
+        _evenRect.y -= _evenRect.h;
     } else {
         for (int y=0; y < height; ++y) {\
             if (upLeftChannels[y*(width+1)+width].isWall()) {
@@ -453,9 +460,9 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
             }
             _oddRect.y += _oddRect.h;
         }
+        _evenRect.y += _evenRect.h*(height-1);
+        _oddRect.y -= _oddRect.h;
     }
-    _oddRect.y += _oddRect.h*(height-1);
-    _evenRect.y += _evenRect.h*(height-1);
 
     // Down border
     _oddRect.x = startOddX;
