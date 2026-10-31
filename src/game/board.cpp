@@ -353,16 +353,22 @@ void Board::blitWalls(const Window& _window, SDL_FRect _rect, bool _up, bool _up
     }
 }
 
-void Board::blitDown(const Window& _window, SDL_FRect _rect) const {
-    _window.drawLine({_rect.x+_rect.w/4, _rect.y+_rect.h}, {_rect.x+_rect.w*3/4, _rect.y+_rect.h});
+void Board::blitDown(const Window& _window, SDL_FRect _rect, bool _wall) const {
+    if (_wall) {
+        _window.drawLine({_rect.x+_rect.w/4, _rect.y+_rect.h}, {_rect.x+_rect.w*3/4, _rect.y+_rect.h});
+    }
 }
 
-void Board::blitUpperRight(const Window& _window, SDL_FRect _rect) const {
-    _window.drawLine({_rect.x+_rect.w*3/4, _rect.y}, {_rect.x+_rect.w, _rect.y+_rect.h/2});
+void Board::blitUpperRight(const Window& _window, SDL_FRect _rect, bool _wall) const {
+    if (_wall) {
+        _window.drawLine({_rect.x+_rect.w*3/4, _rect.y}, {_rect.x+_rect.w, _rect.y+_rect.h/2});
+    }
 }
 
-void Board::blitDownRight(const Window& _window, SDL_FRect _rect) const {
-    _window.drawLine({_rect.x+_rect.w, _rect.y+_rect.h/2}, {_rect.x+_rect.w*3/4, _rect.y+_rect.h});
+void Board::blitDownRight(const Window& _window, SDL_FRect _rect, bool _wall) const {
+    if (_wall) {
+        _window.drawLine({_rect.x+_rect.w, _rect.y+_rect.h/2}, {_rect.x+_rect.w*3/4, _rect.y+_rect.h});
+    }
 }
 
 void Board::blitBlockNormal(const Window& _window, SDL_FRect _rect, int _offset) const {
@@ -430,13 +436,12 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
     float startEvenX = _evenRect.x;
     // Upper border
     for (int x=0; x < width; x+=2) {
-        if (downLeftChannels[x+1].isWall()) {
-            blitUpperRight(_window, _oddRect);
-        }
+        blitUpperRight(_window, _oddRect, downLeftChannels[x+1].isWall());
         _oddRect.x += _oddRect.w * 1.5;
         _evenRect.x += _evenRect.w * 1.5;
     }
     // Main odd part
+    _evenRect.x -= _evenRect.w * 1.5;
     for (int y=0; y < height; ++y) {
         _oddRect.x = startOddX;
         for (int x=0; x < width; x+=2) {
@@ -444,9 +449,17 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
                 downLeftChannels[(y+1)*(width+1)+x].isWall());
             _oddRect.x += _oddRect.w * 1.5;
         }
+        if (width%2 == 0) {
+            blitDownRight(_window, _evenRect, upLeftChannels[y*(width+1)+width].isWall());
+            blitUpperRight(_window, _evenRect, downLeftChannels[y*(width+1)+width].isWall());
+        }
         _oddRect.y += _oddRect.h;
+        _evenRect.y += _evenRect.h;
     }
     // Main even part
+    _oddRect.x -= _oddRect.w * 1.5;
+    _oddRect.y -= _oddRect.h*height;
+    _evenRect.y -= _evenRect.h*height;
     for (int y=0; y < height; ++y) {
         _evenRect.x = startEvenX;
         for (int x=1; x < width; x+=2) {
@@ -454,34 +467,12 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
                 downLeftChannels[(y+1)*(width+1)+x].isWall());
             _evenRect.x += _evenRect.w * 1.5;
         }
+        if (width%2 == 1) {
+            blitDownRight(_window, _oddRect, upLeftChannels[y*(width+1)+width].isWall());
+            blitUpperRight(_window, _oddRect, downLeftChannels[y*(width+1)+width].isWall());
+        }
+        _oddRect.y += _oddRect.h;
         _evenRect.y += _evenRect.h;
-    }
-
-    // Right border
-    _oddRect.x -= _oddRect.w * 1.5;
-    _evenRect.x -= _evenRect.w * 1.5;
-    if (width%2 == 0) {
-        _evenRect.y -= _evenRect.h*height;
-        for (int y=0; y < height; ++y) {
-            if (upLeftChannels[y*(width+1)+width].isWall()) {
-                blitDownRight(_window, _evenRect);
-            }
-            if (downLeftChannels[y*(width+1)+width].isWall()) {
-                blitUpperRight(_window, _evenRect);
-            }
-            _evenRect.y += _evenRect.h;
-        }
-    } else {
-        _oddRect.y -= _oddRect.h*height;
-        for (int y=0; y < height; ++y) {
-            if (upLeftChannels[y*(width+1)+width].isWall()) {
-                blitDownRight(_window, _oddRect);
-            }
-            if (downLeftChannels[y*(width+1)+width].isWall()) {
-                blitUpperRight(_window, _oddRect);
-            }
-            _oddRect.y += _oddRect.h;
-        }
     }
 
     // Down border
@@ -489,23 +480,17 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
     _evenRect.y -= _evenRect.h;
     _oddRect.x = startOddX;
     for (int x=0; x < width; x+=2) {
-        if (upChannels[width*height+x].isWall()) {
-            blitDown(_window, _oddRect);
-        }
+        blitDown(_window, _oddRect, upChannels[width*height+x].isWall());
         _oddRect.x += _oddRect.w * 1.5;
     }
     _evenRect.x = startEvenX;
     for (int x=1; x < width; x+=2) {
-        if (upChannels[width*height+x].isWall()) {
-            blitDown(_window, _evenRect);
-        }
+        blitDown(_window, _evenRect, upChannels[width*height+x].isWall());
         _evenRect.x += _evenRect.w * 1.5;
     }
     _evenRect.x = startEvenX;
     for (int x=1; x < width-1; x+=2) {
-        if (upLeftChannels[(width+1)*height+x].isWall()) {
-            blitDownRight(_window, _evenRect);
-        }
+        blitDownRight(_window, _evenRect, upLeftChannels[(width+1)*height+x].isWall());
         _evenRect.x += _evenRect.w * 1.5;
     }
 }
