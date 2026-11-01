@@ -125,7 +125,6 @@ void BoardInteracter::update() {
 
 void BoardInteracter::blit() const {
     // ! Should get borders to less drowing
-    window.setDrawColor(BLACK);
     const SDL_FRect oddRectLocal = grid.absolute(oddRect);
     const SDL_FRect evenRectLocal = grid.absolute(evenRect);
     switch (showState) {

@@ -37,6 +37,8 @@ class Board {
     Channel* upChannels;  // End on extra line
     Channel* upLeftChannels;  // End on extra line
     Channel* downLeftChannels;  // Starting on extra upper line
+    // Draw info
+    const SDL_FColor wallColor;
 
     Cell& getCell(int x, int y);
     Channel& getUpChannel(int x, int y);

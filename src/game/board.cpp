@@ -8,7 +8,8 @@
 
 Board::Board(unsigned _width, unsigned _height) noexcept
 : height(_height),
-width(_width) {
+width(_width),
+wallColor{0.0, 0.0, 0.0, 1.0} {
     // Allocating arrays
     cells = new Cell[height*width];
     upChannels = new Channel[(height+1)*width];
@@ -338,36 +339,66 @@ void Board::blitUnit(const Window& _window, SDL_FRect _rect, SDL_FColor _color) 
 }
 
 void Board::blitWalls(const Window& _window, SDL_FRect _rect, bool _up, bool _upLeft, bool _downLeft) const {
-    SDL_FPoint p0 = {_rect.x+_rect.w/4,   _rect.y};
-    SDL_FPoint p1 = {_rect.x+_rect.w*3/4, _rect.y};
-    SDL_FPoint p2 = {_rect.x,             _rect.y+_rect.h/2};
-    SDL_FPoint p4 = {_rect.x+_rect.w/4,   _rect.y+_rect.h};
+    SDL_Vertex vertexes[] = {
+        {{_rect.x+_rect.w*0.23f, _rect.y-_rect.h*0.02f}, wallColor},  // 00
+        {{_rect.x+_rect.w*0.28f, _rect.y+_rect.h*0.02f}, wallColor},  // 01
+        {{_rect.x+_rect.w*0.77f, _rect.y-_rect.h*0.02f}, wallColor},  // 10
+        {{_rect.x+_rect.w*0.73f, _rect.y+_rect.h*0.02f}, wallColor},  // 11
+        {{_rect.x-_rect.w*0.03f, _rect.y+_rect.h/2},     wallColor},  // 20
+        {{_rect.x+_rect.w*0.03f, _rect.y+_rect.h/2},     wallColor},  // 21
+        {{_rect.x+_rect.w*0.23f, _rect.y+_rect.h*1.02f}, wallColor},  // 40
+        {{_rect.x+_rect.w*0.28f, _rect.y+_rect.h*0.98f}, wallColor},  // 41
+    };
     if (_up) {
-        _window.drawLine(p0, p1);
+        int order[] = {0, 1, 2,    1, 2, 3};
+        _window.drawGeometry(vertexes, SDL_arraysize(vertexes), order, SDL_arraysize(order));
     }
     if (_upLeft) {
-        _window.drawLine(p0, p2);
+        int order[] = {0, 1, 4,    1, 4, 5};
+        _window.drawGeometry(vertexes, SDL_arraysize(vertexes), order, SDL_arraysize(order));
     }
     if (_downLeft) {
-        _window.drawLine(p2, p4);
+        int order[] = {4, 5, 6,    5, 6, 7};
+        _window.drawGeometry(vertexes, SDL_arraysize(vertexes), order, SDL_arraysize(order));
     }
 }
 
 void Board::blitDown(const Window& _window, SDL_FRect _rect, bool _wall) const {
     if (_wall) {
-        _window.drawLine({_rect.x+_rect.w/4, _rect.y+_rect.h}, {_rect.x+_rect.w*3/4, _rect.y+_rect.h});
+        SDL_Vertex vertexes[] = {
+            {{_rect.x+_rect.w*0.23f, _rect.y+_rect.h*1.02f}, wallColor},
+            {{_rect.x+_rect.w*0.27f, _rect.y+_rect.h*0.98f}, wallColor},
+            {{_rect.x+_rect.w*0.73f, _rect.y+_rect.h*1.02f}, wallColor},
+            {{_rect.x+_rect.w*0.77f, _rect.y+_rect.h*0.98f}, wallColor},
+        };
+        int order[] = {0, 1, 2,    1, 2, 3};
+        _window.drawGeometry(vertexes, SDL_arraysize(vertexes), order, SDL_arraysize(order));
     }
 }
 
 void Board::blitUpperRight(const Window& _window, SDL_FRect _rect, bool _wall) const {
     if (_wall) {
-        _window.drawLine({_rect.x+_rect.w*3/4, _rect.y}, {_rect.x+_rect.w, _rect.y+_rect.h/2});
+        SDL_Vertex vertexes[] = {
+            {{_rect.x+_rect.w*0.72f, _rect.y},           wallColor},
+            {{_rect.x+_rect.w*0.78f, _rect.y},           wallColor},
+            {{_rect.x+_rect.w*0.97f, _rect.y+_rect.h/2}, wallColor},
+            {{_rect.x+_rect.w*1.03f, _rect.y+_rect.h/2}, wallColor},
+        };
+        int order[] = {0, 1, 2,    1, 2, 3};
+        _window.drawGeometry(vertexes, SDL_arraysize(vertexes), order, SDL_arraysize(order));
     }
 }
 
 void Board::blitDownRight(const Window& _window, SDL_FRect _rect, bool _wall) const {
     if (_wall) {
-        _window.drawLine({_rect.x+_rect.w, _rect.y+_rect.h/2}, {_rect.x+_rect.w*3/4, _rect.y+_rect.h});
+        SDL_Vertex vertexes[] = {
+            {{_rect.x+_rect.w*0.97f, _rect.y+_rect.h/2}, wallColor},
+            {{_rect.x+_rect.w*1.03f, _rect.y+_rect.h/2}, wallColor},
+            {{_rect.x+_rect.w*0.72f, _rect.y+_rect.h},   wallColor},
+            {{_rect.x+_rect.w*0.78f, _rect.y+_rect.h},   wallColor},
+        };
+        int order[] = {0, 1, 2,    1, 2, 3};
+        _window.drawGeometry(vertexes, SDL_arraysize(vertexes), order, SDL_arraysize(order));
     }
 }
 
