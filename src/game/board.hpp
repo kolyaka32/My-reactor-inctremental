@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <memory>
 #include "cell.hpp"
 #include "channel.hpp"
 
@@ -30,20 +31,18 @@ class Board {
     // Lengthes of field (with side cells)
     const int height;
     const int width;
-    // Main array of cells
-    // Side cells not using
-    Cell* cells;
-    // Main array of chanels between cells
-    Channel* upChannels;  // End on extra line
-    Channel* upLeftChannels;  // End on extra line
-    Channel* downLeftChannels;  // Starting on extra upper line
+    // Main arrays of cells and channels
+    std::unique_ptr<Cell[]> cells;
+    std::unique_ptr<Channel[]> upChannels;  // End on extra line
+    std::unique_ptr<Channel[]> upLeftChannels;  // End on extra line
+    std::unique_ptr<Channel[]> downLeftChannels;  // Starting on extra upper line
     // Draw info
     const SDL_FColor wallColor;
 
-    Cell& getCell(int x, int y);
-    Channel& getUpChannel(int x, int y);
-    Channel& getLeftUpChannel(int x, int y);
-    Channel& getLeftDownChannel(int x, int y);
+    Cell& getCell(int x, int y) const;
+    Channel& getUpChannel(int x, int y) const;
+    Channel& getLeftUpChannel(int x, int y) const;
+    Channel& getLeftDownChannel(int x, int y) const;
 
     // Calculations per unit
     const float resistance = 0.4;
@@ -64,9 +63,6 @@ class Board {
 
  public:
     Board(unsigned width, unsigned height) noexcept;
-    Board(const Board& board) = delete;
-    Board(Board&& board) = delete;
-    ~Board() noexcept;
     void reset();
 
     // Interactions

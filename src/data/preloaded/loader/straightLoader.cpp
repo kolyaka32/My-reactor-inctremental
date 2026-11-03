@@ -14,15 +14,14 @@
 
 SDL_IOStream* StraightLoader::load(const char* _fileName) const {
     // Creating modified name
-    size_t size = strlen(_fileName) + strlen("../") + 1;
-    char* fileName = new char[size];
-    SDL_snprintf(fileName, size, "../%s", _fileName);
+    char* fileName;
+    SDL_asprintf(&fileName, "../%s", _fileName);
 
     // Openning file straight from system
     SDL_IOStream* data = SDL_IOFromFile(fileName, "r");
 
     // Clearing temporary name
-    delete[] fileName;
+    SDL_free(fileName);
 
     // Checking correction of loaded font
     #if (CHECK_CORRECTION)
@@ -31,7 +30,6 @@ SDL_IOStream* StraightLoader::load(const char* _fileName) const {
         return nullptr;
     }
     #endif
-
     return data;
 }
 
