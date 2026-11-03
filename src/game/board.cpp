@@ -30,7 +30,7 @@ void Board::reset() {
     // Placing vertical borders
     for (int x=0; x < width; ++x) {
         getUpChannel(x, 0).setWall();
-        getUpChannel(0, height).setWall();
+        getUpChannel(x, height).setWall();
     }
     for (int x=1; x < width; x+=2) {
         getLeftDownChannel(x, -1).setWall();
@@ -510,12 +510,12 @@ void Board::blitLines(const Window& _window, SDL_FRect _oddRect, SDL_FRect _even
     _evenRect.y -= _evenRect.h;
     _oddRect.x = startOddX;
     for (int x=0; x < width; x+=2) {
-        blitDown(_window, _oddRect, getUpChannel(x, height+1).isWall());
+        blitDown(_window, _oddRect, getUpChannel(x, height).isWall());
         _oddRect.x += _oddRect.w * 1.5;
     }
     _evenRect.x = startEvenX;
     for (int x=1; x < width; x+=2) {
-        blitDown(_window, _evenRect, getUpChannel(x, height+1).isWall());
+        blitDown(_window, _evenRect, getUpChannel(x, height).isWall());
         _evenRect.x += _evenRect.w * 1.5;
     }
     _evenRect.x = startEvenX;

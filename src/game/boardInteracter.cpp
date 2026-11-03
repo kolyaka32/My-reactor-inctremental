@@ -53,16 +53,22 @@ ChannelPos BoardInteracter::getPosition(const Mouse _mouse) const {
     const float border = 0.4;
     // Left down
     float leftDown = frac_r/2-frac_q/2;
+    float up = frac_r+frac_q/2;
     if (s % 2 == 0) {
         if (SDL_fabs(leftDown - SDL_roundf(leftDown)) > border) {
             if (qn % 2 == 0) {
-                return {3, qn, y};
+                if (SDL_fabs(up - SDL_roundf(up))) {
+                    return {3, qn, y};
+                }
             } else {
-                return {3, qn, y-1};
+                if (SDL_fabs(up - SDL_roundf(up))) {
+                    return {3, qn, y-1};
+                }
             }
         }
     } else {
-        if (SDL_fabs(leftDown - SDL_roundf(leftDown)) < 0.5-border) {
+        if (SDL_fabs(leftDown - SDL_roundf(leftDown)) < 0.5-border &&
+            true) {
             if (qn % 2 == 0) {
                 return {3, qn, y};
             } else {
@@ -82,7 +88,6 @@ ChannelPos BoardInteracter::getPosition(const Mouse _mouse) const {
         }
     }
     // Vertical
-    float up = frac_r+frac_q/2;
     if (q % 2 == 0) {
         if (SDL_fabs(up - SDL_roundf(up)) > border) {
             return {1, q, yn};
