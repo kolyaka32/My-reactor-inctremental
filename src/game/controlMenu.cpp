@@ -13,7 +13,7 @@ panelBackplate(_window, _panelW/2, 0.5, _panelW, 1.0, 2.0, GREY, BLACK),
 modeText(_window, {"Show mode:", "Режим отображения:"}, {_panelW/2, 0.15, .frame=1}),
 modeSwitchBox(_window, {_panelW/2, 0.185, .textColor = BLACK, .backColor = WHITE}, 0.14, {{"Elements", "Элементы"},
     {"Thermal", "Температурный"}, {"Pressure", "Давление"}, {"Speed", "Скорость"}, {"Random", "Случайные"}}),
-pickedElement(_window, {"Element: %d %d", "Элемент: %d %d"},
+pickedElement(_window, {"Element: %f %f", "Элемент: %f %f"},
     {_panelW/4, 0.36, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
 pickedPressure(_window, {"Pressure: %6.1f", "Давление: %6.1f"},
     {_panelW/4, 0.39, .frame=1, .height=GUI::Main, .horAli=GUI::Left}),
@@ -74,9 +74,9 @@ bool ControlMenu::click(const Mouse _mouse) {
 
     case SDL_BUTTON_X1MASK:  // Apply action
         pos = interacter.getPosition(_mouse);
-        if (interacter.isLegimate(pos)) {
+        /*if (interacter.isLegimate(pos)) {
             interacter.applyAction(pos);
-        }
+        }*/
         return true;
 
     default:
