@@ -56,6 +56,7 @@ ChannelPos BoardInteracter::getPosition(const Mouse _mouse) const {
     float up = frac_r+frac_q/2;
     if (s % 2 == 0) {
         if (SDL_fabs(leftDown - SDL_roundf(leftDown)) > border) {
+            return {3, SDL_fabs(up - SDL_roundf(up)), 0.0};
             if (qn % 2 == 0) {
                 if (SDL_fabs(up - SDL_roundf(up))) {
                     return {3, qn, y};

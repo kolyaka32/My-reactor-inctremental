@@ -133,7 +133,7 @@ void ControlMenu::update(const Mouse _mouse) {
         holdingCellRect.y = _mouse.getY() - holdingCellRect.h/2;
     }*/
 
-    if (interacter.isLegimate(pos)) {
+    /*if (interacter.isLegimate(pos)) {
         // Check pressing on field
         switch (mousePress) {
         case SDL_BUTTON_LMASK:
@@ -175,7 +175,7 @@ void ControlMenu::update(const Mouse _mouse) {
         pickedUpSpeed.setValues(0.0f);
         pickedLeftUpSpeed.setValues(0.0f);
         pickedLeftDownSpeed.setValues(0.0f);
-    }
+    }*/
 }
 
 void ControlMenu::blit() const {

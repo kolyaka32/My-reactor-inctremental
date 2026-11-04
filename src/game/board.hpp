@@ -22,7 +22,7 @@ struct CellInfo {
 // Special position for channel
 struct ChannelPos {
     int type;  // 0 for cell, 1 for up, 2 for leftUp and 3 for leftDown
-    int x, y;
+    float x, y;
 };
 
 // Main object

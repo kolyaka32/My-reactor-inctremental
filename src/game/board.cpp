@@ -47,7 +47,7 @@ void Board::reset() {
 }
 
 bool Board::isLegimate(ChannelPos _pos) const {
-    switch (_pos.type) {
+    /*switch (_pos.type) {
     case 0:  // Cell
         return _pos.x >= 0 && _pos.x < width &&
             _pos.y >= 0 && _pos.y < height;
@@ -73,11 +73,11 @@ bool Board::isLegimate(ChannelPos _pos) const {
             return _pos.x > 0 && _pos.x < width &&
                 _pos.y >= 0 && _pos.y < height-1;
         }
-    }
+    }*/
 }
 
 CellInfo Board::getInfo(ChannelPos _pos) const {
-    switch (_pos.type) {
+    /*switch (_pos.type) {
     case 0:  // Cell
         return {cells[_pos.y*width+_pos.x].temperature,
             cells[_pos.y*width+_pos.x].pressure};
@@ -90,7 +90,7 @@ CellInfo Board::getInfo(ChannelPos _pos) const {
 
     default:  // Left down channel
         return {.speed = downLeftChannels[(_pos.y+1)*(width+1)+_pos.x].sp};
-    }
+    }*/
 }
 
 Cell& Board::getCell(int _x, int _y) const {
