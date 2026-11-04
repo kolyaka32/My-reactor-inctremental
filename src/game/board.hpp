@@ -13,10 +13,10 @@
 // Additional info about one cell for show
 struct CellInfo {
     // For cell
-    float temperature;
-    float pressure;
+    float temperature = 0.0;
+    float pressure = 0.0;
     // For channel
-    float speed;
+    float speed = 0.0;
 };
 
 // Special position for channel

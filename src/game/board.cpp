@@ -317,11 +317,12 @@ void Board::advectSpeed() {
 SDL_FColor Board::getSpeedColor(SDL_Point _pos) const {
     return {getUpChannel(_pos.y, _pos.x).sp/10.0f+0.5f,
         getLeftUpChannel(_pos.y, _pos.x).sp/10.0f+0.5f,
-        getLeftDownChannel(_pos.y, _pos.x).sp/10.0f+0.5f};
+        getLeftDownChannel(_pos.y, _pos.x).sp/10.0f+0.5f,
+        1.0f};
 }
 
 SDL_FColor Board::getRandomColor() const {
-    return {SDL_randf(), SDL_randf(), SDL_randf()};
+    return {SDL_randf(), SDL_randf(), SDL_randf(), 1.0f};
 }
 
 void Board::blitUnit(const Window& _window, SDL_FRect _rect, SDL_FColor _color) const {

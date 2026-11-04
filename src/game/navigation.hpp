@@ -22,9 +22,9 @@ class Grid {
     Grid();
     void reset();
 
-    void click(float mouseX, float mouseY);
+    void click(const Mouse mouse);
     void zoom(float wheelY, const Mouse mouse);
-    void update(float mouseX, float mouseY);
+    void update(const Mouse mouse);
 
     // Work with local and absolute coordinats
     float absoluteX(float localX) const;

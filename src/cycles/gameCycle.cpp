@@ -9,7 +9,7 @@
 GameCycle::GameCycle(Window& _window)
 : BaseCycle(_window),
 board(_window),
-menu(_window, 0.26, 0.05, 0.25, board) {
+menu(_window, 0.125, 0.25, board) {
     if (!isRestarted()) {
         // Resetting field
         board.reset();

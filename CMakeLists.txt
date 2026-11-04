@@ -18,7 +18,7 @@ if (WIN32)
 endif (WIN32)
 
 # Setting all flags (more warnings), remove debug
-add_compile_options(-Wall)
+add_compile_options(-Wall -Wextra)
 
 # Remove debug functions in release
 if (CMAKE_BUILD_TYPE STREQUAL "Release")

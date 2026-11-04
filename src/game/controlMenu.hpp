@@ -27,13 +27,20 @@ class ControlMenu : public GUI::Template {
     GUI::DynamicText pickedElement;
     GUI::DynamicText pickedPressure, pickedTemperature;
     GUI::DynamicText pickedUpSpeed, pickedLeftUpSpeed, pickedLeftDownSpeed;
+    // Build block
     GUI::StaticText buildText;
     GUI::SwitchBox buildSwitchBox;
     GUI::TextButton resetButton;
+    // Control hint
+    GUI::StaticText hintText;
+    GUI::StaticText interactionText;
+    GUI::StaticText movementText;
+    GUI::StaticText setText;
+    // Global text
     GUI::StaticText stoppedText;
 
  public:
-    ControlMenu(const Window& window, float boardX, float boardY, float panelW, BoardInteracter& interacter);
+    ControlMenu(const Window& window, float X, float W, BoardInteracter& interacter);
 
     void reset();
     bool click(const Mouse mouse);
